@@ -1,0 +1,2 @@
+# Friday
+Nural system ai
