@@ -1,335 +1,715 @@
 let locked=true;
+let neuralAnimation;
 
 const $=id=>document.getElementById(id);
 
+
+/* VOICE */
+
 function speak(text){
- $("reply").textContent="FRIDAY: "+text;
 
- speechSynthesis.cancel();
+$("reply").textContent=
+"FRIDAY: "+text;
 
- let voice=new SpeechSynthesisUtterance(text);
- voice.rate=.95;
- voice.pitch=.9;
+speechSynthesis.cancel();
 
- speechSynthesis.speak(voice);
+let u=
+new SpeechSynthesisUtterance(text);
+
+u.lang="en-US";
+u.rate=.82;
+u.pitch=.55;
+u.volume=1;
+
+speechSynthesis.speak(u);
 }
+
+
+/* LOCK */
 
 function toggleLock(){
 
- locked=!locked;
+locked=!locked;
 
- $("lockBtn").textContent=locked?"🔒":"🔓";
+document.querySelector(
+"header button"
+).textContent=
+locked?"🔒":"🔓";
 
- $("status").textContent=
- locked?"SYSTEM LOCKED":"SYSTEM ONLINE";
+$("status").textContent=
+locked?
+"SYSTEM LOCKED":
+"SYSTEM ONLINE";
 
- if(locked)
-  speak("Systems locked.");
- else
-  speak("Systems online.");
+speak(
+locked?
+"Systems locked.":
+"Systems online."
+);
 }
+
+
+/* COMMAND SYSTEM */
 
 function run(){
 
- let text=$("cmd").value.trim();
+let text=
+$("cmd").value.trim();
 
- if(!text)return;
+if(!text)return;
 
- let q=text.toLowerCase();
+let q=text.toLowerCase();
 
- if(q.includes("unlock friday")||q==="unlock"){
-  locked=false;
-  $("lockBtn").textContent="🔓";
-  $("status").textContent="SYSTEM ONLINE";
-  speak("Systems online.");
-  return;
- }
 
- if(q.includes("lock friday")||q==="lock"){
-  locked=true;
-  $("lockBtn").textContent="🔒";
-  $("status").textContent="SYSTEM LOCKED";
-  speak("Systems locked.");
-  return;
- }
+if(q==="unlock" ||
+q.includes("unlock friday")){
 
- if(locked){
-  speak("Please unlock me first.");
-  return;
- }
+locked=false;
 
- if(q.includes("show neural")||
-    q.includes("neural system")){
+$("status").textContent=
+"SYSTEM ONLINE";
 
-   showNeural();
-   return;
- }
+speak("Systems online.");
 
- if(q.includes("exit neural")){
-  hideNeural();
-  return;
- }
-
- if(q.startsWith("open ")){
-
-  let name=q.substring(5).trim();
-
-  let sites={
-   "youtube":"https://youtube.com",
-   "chatgpt":"https://chatgpt.com",
-   "google":"https://google.com",
-   "github":"https://github.com",
-   "instagram":"https://instagram.com",
-   "roblox":"https://roblox.com",
-   "whatsapp":"https://web.whatsapp.com"
-  };
-
-  let url=sites[name];
-
-  if(!url){
-
-   if(name.startsWith("http"))
-    url=name;
-   else
-    url="https://"+name;
-  }
-
-  speak("Opening "+name);
-
-  setTimeout(()=>{
-   window.open(url,"_blank");
-  },600);
-
-  return;
- }
-
- if(q.startsWith("search ")){
-
-  google(text.substring(7));
-  return;
- }
-
- google(text);
+return;
 }
+
+
+if(q==="lock" ||
+q.includes("lock friday")){
+
+locked=true;
+
+$("status").textContent=
+"SYSTEM LOCKED";
+
+speak("Systems locked.");
+
+return;
+}
+
+
+if(locked){
+
+speak(
+"Please unlock me first."
+);
+
+return;
+}
+
+
+/* NEURAL */
+
+if(q.includes("show neural") ||
+q.includes("neural system")){
+
+showNeural();
+
+return;
+}
+
+
+if(q.includes("exit neural")){
+
+hideNeural();
+
+return;
+}
+
+
+/* OPEN WEBSITES */
+
+if(q.startsWith("open ")){
+
+let name=
+q.substring(5).trim();
+
+let sites={
+
+youtube:
+"https://youtube.com",
+
+chatgpt:
+"https://chatgpt.com",
+
+google:
+"https://google.com",
+
+github:
+"https://github.com",
+
+instagram:
+"https://instagram.com",
+
+roblox:
+"https://roblox.com",
+
+whatsapp:
+"https://web.whatsapp.com"
+
+};
+
+let url=sites[name];
+
+if(!url){
+
+url=name.startsWith("http")?
+name:
+"https://"+name;
+
+}
+
+speak(
+"Opening "+name
+);
+
+setTimeout(()=>{
+
+window.open(
+url,
+"_blank"
+);
+
+},600);
+
+return;
+}
+
+
+/* SEARCH */
+
+if(q.startsWith("search ")){
+
+google(
+text.substring(7)
+);
+
+return;
+}
+
+
+/* NORMAL QUESTION */
+
+google(text);
+
+}
+
+
+/* GOOGLE */
 
 function google(text){
 
- speak("Searching Google.");
+speak(
+"Searching Google."
+);
 
- setTimeout(()=>{
+setTimeout(()=>{
 
-  window.open(
-   "https://www.google.com/search?q="+
-   encodeURIComponent(text),
-   "_blank"
-  );
+window.open(
 
- },600);
+"https://www.google.com/search?q="+
+encodeURIComponent(text),
+
+"_blank"
+
+);
+
+},600);
+
 }
+
+
+/* VOICE */
 
 function voice(){
 
- if(!("webkitSpeechRecognition" in window)){
+if(!("webkitSpeechRecognition"
+in window)){
 
-  speak("Voice recognition is not supported.");
-  return;
+speak(
+"Voice recognition is not supported."
+);
 
- }
+return;
 
- let recognition=
- new webkitSpeechRecognition();
+}
 
- recognition.lang="en-US";
- recognition.continuous=false;
+let r=
+new webkitSpeechRecognition();
 
- $("status").textContent="LISTENING...";
+r.lang="en-US";
 
- recognition.start();
+$("status").textContent=
+"LISTENING...";
 
- recognition.onresult=e=>{
+r.start();
 
-  let text=
-   e.results[0][0].transcript;
+r.onresult=e=>{
 
-  $("cmd").value=text;
+let text=
+e.results[0][0].transcript;
 
-  $("status").textContent="PROCESSING...";
+$("cmd").value=text;
 
-  run();
- };
+run();
 
- recognition.onerror=()=>{
-  $("status").textContent=
-   locked?"SYSTEM LOCKED":"SYSTEM ONLINE";
- };
+};
+
 }
 
 
 /* NEURAL SYSTEM */
 
-let animation;
-
 function showNeural(){
 
- if(locked){
+if(locked){
 
-  speak("Unlock me to access the neural system.");
-  return;
+speak(
+"Unlock me to access the neural system."
+);
 
- }
+return;
 
- $("ui").style.display="none";
- $("neural").style.display="block";
-
- createBrain();
 }
+
+$("ui").style.display="none";
+
+$("neural").style.display="block";
+
+createNeural();
+
+}
+
 
 function hideNeural(){
 
- $("neural").style.display="none";
- $("ui").style.display="block";
+$("neural").style.display="none";
 
- cancelAnimationFrame(animation);
+$("ui").style.display="block";
 
- speak("Neural system closed.");
+cancelAnimationFrame(
+neuralAnimation
+);
+
 }
 
-function createBrain(){
 
- let canvas=$("brain");
- let ctx=canvas.getContext("2d");
+/* ANIMATED NEURAL NETWORK */
 
- canvas.width=innerWidth;
- canvas.height=innerHeight*.82;
+function createNeural(){
 
- let nodes=[];
+let canvas=
+$("brain");
 
- for(let i=0;i<120;i++){
+let ctx=
+canvas.getContext("2d");
 
-  nodes.push({
+canvas.width=
+innerWidth;
 
-   x:Math.random()*canvas.width,
-   y:Math.random()*canvas.height,
+canvas.height=
+innerHeight*.82;
 
-   vx:(Math.random()-.5)*1.2,
-   vy:(Math.random()-.5)*1.2,
 
-   pulse:Math.random()*10
+let nodes=[];
 
-  });
- }
+for(let i=0;i<130;i++){
 
- let signals=[];
+nodes.push({
 
- function draw(){
+x:Math.random()*canvas.width,
 
-  ctx.clearRect(
-   0,0,
-   canvas.width,
-   canvas.height
-  );
+y:Math.random()*canvas.height,
 
-  /* connections */
+vx:(Math.random()-.5)*1.4,
 
-  for(let a of nodes){
+vy:(Math.random()-.5)*1.4,
 
-   for(let b of nodes){
+pulse:Math.random()*10
 
-    let dx=a.x-b.x;
-    let dy=a.y-b.y;
+});
 
-    let d=Math.sqrt(dx*dx+dy*dy);
+}
 
-    if(d<110){
 
-     ctx.strokeStyle=
-      "rgba(255,216,74,"+
-      (1-d/110)*.45+")";
+let signals=[];
 
-     ctx.lineWidth=1;
 
-     ctx.beginPath();
+function draw(){
 
-     ctx.moveTo(a.x,a.y);
-     ctx.lineTo(b.x,b.y);
+ctx.clearRect(
+0,0,
+canvas.width,
+canvas.height
+);
 
-     ctx.stroke();
-    }
-   }
-  }
 
-  /* nodes */
+/* CONNECTIONS */
 
-  for(let n of nodes){
+for(let a of nodes){
 
-   n.x+=n.vx;
-   n.y+=n.vy;
+for(let b of nodes){
 
-   n.pulse+=.08;
+let d=Math.hypot(
+a.x-b.x,
+a.y-b.y
+);
 
-   if(n.x<0||n.x>canvas.width)
-    n.vx*=-1;
+if(d<115){
 
-   if(n.y<0||n.y>canvas.height)
-    n.vy*=-1;
+ctx.strokeStyle=
+"rgba(255,216,61,"+
+(1-d/115)*.4+
+")";
 
-   let glow=
-    3+Math.sin(n.pulse)*2;
+ctx.beginPath();
 
-   ctx.shadowBlur=glow*4;
-   ctx.shadowColor="#ffd84a";
-   ctx.fillStyle="#ffd84a";
+ctx.moveTo(
+a.x,a.y
+);
 
-   ctx.beginPath();
+ctx.lineTo(
+b.x,b.y
+);
 
-   ctx.arc(
-    n.x,
-    n.y,
-    2.5+Math.sin(n.pulse)*.7,
-    0,
-    Math.PI*2
-   );
+ctx.stroke();
 
-   ctx.fill();
-  }
+}
 
-  /* moving neural signals */
+}
 
-  if(Math.random()<.08){
+}
 
-   let n=
-    nodes[Math.floor(Math.random()*nodes.length)];
 
-   signals.push({
-    x:n.x,
-    y:n.y,
-    life:0,
-    max:60
-   });
-  }
+/* NEURONS */
 
-  for(let s of signals){
+for(let n of nodes){
 
-   s.life++;
+n.x+=n.vx;
+n.y+=n.vy;
 
-   s.x+=1.8;
-   s.y+=Math.sin(s.life*.15);
+n.pulse+=.08;
 
-   ctx.fillStyle="#ffffff";
-   ctx.shadowBlur=20;
-   ctx.shadowColor="#ffd84a";
+if(n.x<0 ||
+n.x>canvas.width)
+n.vx*=-1;
 
-   ctx.beginPath();
-   ctx.arc(s.x,s.y,4,0,Math.PI*2);
-   ctx.fill();
-  }
+if(n.y<0 ||
+n.y>canvas.height)
+n.vy*=-1;
 
-  signals=
-   signals.filter(s=>s.life<s.max);
+let size=
+3+Math.sin(n.pulse);
 
-  animation=
-   requestAnimationFrame(draw);
- }
+ctx.shadowBlur=18;
 
- draw();
+ctx.shadowColor="#ffd83d";
+
+ctx.fillStyle="#ffd83d";
+
+ctx.beginPath();
+
+ctx.arc(
+n.x,
+n.y,
+size,
+0,
+Math.PI*2
+);
+
+ctx.fill();
+
+}
+
+
+/* SIGNALS */
+
+if(Math.random()<.1){
+
+let n=
+nodes[
+Math.floor(
+Math.random()*nodes.length
+)
+];
+
+signals.push({
+
+x:n.x,
+y:n.y,
+life:0
+
+});
+
+}
+
+
+for(let s of signals){
+
+s.x+=2;
+
+s.life++;
+
+ctx.fillStyle="#fff";
+
+ctx.shadowBlur=25;
+
+ctx.shadowColor="#ffd83d";
+
+ctx.beginPath();
+
+ctx.arc(
+s.x,
+s.y,
+4,
+0,
+Math.PI*2
+);
+
+ctx.fill();
+
+}
+
+signals=
+signals.filter(
+s=>s.life<70
+);
+
+
+neuralAnimation=
+requestAnimationFrame(draw);
+
+}
+
+draw();
+
+}
+
+
+/* HAND TRACKING */
+
+let camera;
+let hands;
+
+
+function startHands(){
+
+if(locked){
+
+speak(
+"Unlock me before enabling hand tracking."
+);
+
+return;
+}
+
+$("handUI").style.display=
+"block";
+
+let video=
+$("video");
+
+hands=
+new Hands({
+
+locateFile:file=>
+`https://cdn.jsdelivr.net/npm/@mediapipe/hands/${file}`
+
+});
+
+
+hands.setOptions({
+
+maxNumHands:1,
+
+modelComplexity:1,
+
+minDetectionConfidence:.6,
+
+minTrackingConfidence:.6
+
+});
+
+
+hands.onResults(
+handResults
+);
+
+
+camera=
+new Camera(
+video,
+{
+
+onFrame:async()=>{
+
+await hands.send({
+image:video
+});
+
+},
+
+width:640,
+height:480
+
+});
+
+
+camera.start();
+
+speak(
+"Hand tracking online."
+);
+
+}
+
+
+function stopHands(){
+
+$("handUI").style.display=
+"none";
+
+if(camera){
+
+camera.stop();
+
+}
+
+}
+
+
+function handResults(results){
+
+let canvas=
+$("handCanvas");
+
+let ctx=
+canvas.getContext("2d");
+
+canvas.width=
+innerWidth;
+
+canvas.height=
+innerHeight;
+
+ctx.clearRect(
+0,0,
+canvas.width,
+canvas.height
+);
+
+
+if(!results.multiHandLandmarks)
+return;
+
+
+for(let hand of
+results.multiHandLandmarks){
+
+/* DRAW NEURAL-LIKE HAND */
+
+for(let p of hand){
+
+let x=
+(1-p.x)*canvas.width;
+
+let y=
+p.y*canvas.height;
+
+ctx.fillStyle="#ffd83d";
+
+ctx.shadowBlur=15;
+
+ctx.shadowColor="#ffd83d";
+
+ctx.beginPath();
+
+ctx.arc(
+x,y,
+5,
+0,
+Math.PI*2
+);
+
+ctx.fill();
+
+}
+
+
+/* INDEX FINGER */
+
+let index=hand[8];
+
+let x=
+(1-index.x)*canvas.width;
+
+let y=
+index.y*canvas.height;
+
+
+/* HOLOGRAPHIC CURSOR */
+
+ctx.strokeStyle="#fff";
+
+ctx.lineWidth=2;
+
+ctx.beginPath();
+
+ctx.arc(
+x,y,
+25,
+0,
+Math.PI*2
+);
+
+ctx.stroke();
+
+
+/* PINCH */
+
+let thumb=hand[4];
+
+let tx=
+(1-thumb.x)*canvas.width;
+
+let ty=
+thumb.y*canvas.height;
+
+let distance=
+Math.hypot(
+x-tx,
+y-ty
+);
+
+
+if(distance<35){
+
+ctx.strokeStyle="#fff";
+
+ctx.beginPath();
+
+ctx.arc(
+x,y,
+40,
+0,
+Math.PI*2
+);
+
+ctx.stroke();
+
+$("status").textContent=
+"HAND SELECT";
+
+}
+
+else{
+
+$("status").textContent=
+"HAND TRACKING";
+
+}
+
+}
+
 }
