@@ -2,116 +2,131 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<meta name="viewport"
- content="width=device-width,initial-scale=1">
-
-<title>FRIDAY MARK 2.1</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>FRIDAY MK 2.2</title>
 
 <link rel="stylesheet" href="style.css">
 
-<script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js"></script>
 </head>
 
-<body>
+<body class="locked">
 
-<div id="ui">
+<div id="app">
 
 <header>
   <div>
-    <small>STARK INDUSTRIES</small>
-    <h2>F.R.I.D.A.Y <span>MK 2.1</span></h2>
+    <small>STARK SYSTEMS</small>
+    <h2>F.R.I.D.A.Y <span>MK 2.2</span></h2>
   </div>
 
-  <button onclick="toggleLock()">🔒</button>
+  <button id="lockBtn">🔒</button>
 </header>
 
 <div class="hud">
 
   <div class="core">
+    <div class="orbit one"></div>
+    <div class="orbit two"></div>
+    <div class="orbit three"></div>
 
-    <div class="orbit o1"></div>
-    <div class="orbit o2"></div>
-    <div class="orbit o3"></div>
-
-    <div class="energy"></div>
-
-    <div class="coreText">F</div>
-
+    <div class="coreLetter">F</div>
   </div>
 
 </div>
 
 <div id="status">SYSTEM LOCKED</div>
 
-<div class="buttons">
+<div class="controls">
 
-<button onclick="startHands()">
-✋
-<small>HAND</small>
-</button>
+  <button id="unlockBtn" onclick="toggleLock()">
+    🔓
+    <small>UNLOCK</small>
+  </button>
 
-<button onclick="voice()">
-🎤
-<small>VOICE</small>
-</button>
+  <button onclick="startHands()">
+    ✋
+    <small>HAND TRACK</small>
+  </button>
 
-<button onclick="showNeural()">
-🧠
-<small>NEURAL</small>
-</button>
+  <button onclick="showNeural()">
+    🧠
+    <small>NEURAL</small>
+  </button>
+
+  <button onclick="voice()">
+    🎤
+    <small>VOICE</small>
+  </button>
 
 </div>
 
 <div class="command">
-
-<input id="cmd"
-placeholder="Ask FRIDAY...">
-
-<button onclick="run()">➤</button>
-
+  <input id="cmd" placeholder="Ask FRIDAY...">
+  <button onclick="run()">➤</button>
 </div>
 
-<div id="reply">
-Awaiting command...
-</div>
+<div id="reply">Awaiting command...</div>
 
 </div>
 
 
-<!-- NEURAL MODE -->
+<!-- NEURAL SYSTEM -->
 
 <div id="neural">
 
-<button class="exit"
-onclick="hideNeural()">✕ EXIT</button>
+  <div class="neuralTop">
+    <div>
+      <small>FRIDAY CORE</small>
+      <h1>NEURAL SYSTEM</h1>
+    </div>
 
-<h1>NEURAL SYSTEM</h1>
+    <button onclick="hideNeural()">✕ EXIT</button>
+  </div>
 
-<div class="neuralStatus">
-● NEURAL CORE ONLINE
+  <div class="neuralButtons">
+
+    <button onclick="zoomNeural(1.2)">
+      ＋ ZOOM
+    </button>
+
+    <button onclick="zoomNeural(.8)">
+      − ZOOM
+    </button>
+
+    <button onclick="resetNeural()">
+      ⟳ RESET
+    </button>
+
+    <button onclick="startHands()">
+      ✋ HAND
+    </button>
+
+  </div>
+
+  <canvas id="brain"></canvas>
+
 </div>
 
-<canvas id="brain"></canvas>
 
-</div>
-
-
-<!-- HAND CAMERA -->
+<!-- HAND TRACKING -->
 
 <div id="handUI">
 
-<video id="video"
-autoplay
-playsinline></video>
+  <video id="video" autoplay playsinline></video>
 
-<canvas id="handCanvas"></canvas>
+  <canvas id="handCanvas"></canvas>
 
-<div class="handText">
-HAND TRACKING ONLINE
-</div>
+  <div class="handInfo">
+    <b>HAND TRACKING</b>
+    <br>
+    <span id="gesture">SEARCHING FOR HAND...</span>
+  </div>
 
-<button onclick="stopHands()">✕</button>
+  <button class="closeHand" onclick="stopHands()">
+    ✕
+  </button>
 
 </div>
 
