@@ -1,89 +1,196 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
+
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>FRIDAY MK 2.2</title>
+  <meta charset="UTF-8">
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1.0">
 
-<link rel="stylesheet" href="style.css">
+  <title>FRIDAY MK 2.2</title>
 
-<script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js"></script>
+  <link rel="stylesheet" href="style.css">
+
+  <!-- MediaPipe Hands -->
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js"></script>
 </head>
 
 <body class="locked">
 
 <div id="app">
 
-<header>
-  <div>
-    <small>STARK SYSTEMS</small>
-    <h2>F.R.I.D.A.Y <span>MK 2.2</span></h2>
+  <!-- HEADER -->
+
+  <header>
+
+    <div>
+      <small>STARK SYSTEMS</small>
+
+      <h2>
+        F.R.I.D.A.Y
+        <span>MK 2.2</span>
+      </h2>
+    </div>
+
+    <button id="lockBtn">🔒</button>
+
+  </header>
+
+
+  <!-- FRIDAY CORE -->
+
+  <div class="hud">
+
+    <div class="fridayCore">
+
+      <!-- OUTER RING -->
+
+      <div class="hudRing ringOuter">
+
+        <div class="arc arc1"></div>
+        <div class="arc arc2"></div>
+
+      </div>
+
+
+      <!-- MIDDLE RING -->
+
+      <div class="hudRing ringMiddle">
+
+        <div class="arc arc3"></div>
+        <div class="arc arc4"></div>
+
+      </div>
+
+
+      <!-- INNER RING -->
+
+      <div class="hudRing ringInner">
+
+        <div class="arc arc5"></div>
+
+      </div>
+
+
+      <!-- CENTER -->
+
+      <div class="centerCore">
+
+        <div class="corePulse"></div>
+
+        <div class="coreText">
+          FRIDAY
+        </div>
+
+      </div>
+
+    </div>
+
   </div>
 
-  <button id="lockBtn">🔒</button>
-</header>
 
-<div class="hud">
+  <!-- STATUS -->
 
-  <div class="core">
-    <div class="orbit one"></div>
-    <div class="orbit two"></div>
-    <div class="orbit three"></div>
+  <div id="status">
+    SYSTEM LOCKED
+  </div>
 
-    <div class="coreLetter">F</div>
+
+  <!-- CONTROL BUTTONS -->
+
+  <div class="controls">
+
+    <button id="unlockBtn"
+            onclick="toggleLock()">
+
+      🔓
+      <small>UNLOCK</small>
+
+    </button>
+
+
+    <button onclick="startHands()">
+
+      ✋
+      <small>HAND TRACK</small>
+
+    </button>
+
+
+    <button onclick="showNeural()">
+
+      🧠
+      <small>NEURAL</small>
+
+    </button>
+
+
+    <button onclick="voice()">
+
+      🎤
+      <small>VOICE</small>
+
+    </button>
+
+  </div>
+
+
+  <!-- COMMAND BOX -->
+
+  <div class="command">
+
+    <input
+      id="cmd"
+      type="text"
+      placeholder="Ask FRIDAY..."
+      autocomplete="off"
+    >
+
+    <button onclick="run()">
+      ➤
+    </button>
+
+  </div>
+
+
+  <!-- FRIDAY RESPONSE -->
+
+  <div id="reply">
+    Awaiting command...
   </div>
 
 </div>
 
-<div id="status">SYSTEM LOCKED</div>
-
-<div class="controls">
-
-  <button id="unlockBtn" onclick="toggleLock()">
-    🔓
-    <small>UNLOCK</small>
-  </button>
-
-  <button onclick="startHands()">
-    ✋
-    <small>HAND TRACK</small>
-  </button>
-
-  <button onclick="showNeural()">
-    🧠
-    <small>NEURAL</small>
-  </button>
-
-  <button onclick="voice()">
-    🎤
-    <small>VOICE</small>
-  </button>
-
-</div>
-
-<div class="command">
-  <input id="cmd" placeholder="Ask FRIDAY...">
-  <button onclick="run()">➤</button>
-</div>
-
-<div id="reply">Awaiting command...</div>
-
-</div>
 
 
-<!-- NEURAL SYSTEM -->
+<!-- =========================
+     NEURAL SYSTEM
+========================= -->
 
 <div id="neural">
 
   <div class="neuralTop">
+
     <div>
-      <small>FRIDAY CORE</small>
-      <h1>NEURAL SYSTEM</h1>
+
+      <small>
+        FRIDAY CORE
+      </small>
+
+      <h1>
+        NEURAL SYSTEM
+      </h1>
+
     </div>
 
-    <button onclick="hideNeural()">✕ EXIT</button>
+    <button onclick="hideNeural()">
+      ✕ EXIT
+    </button>
+
   </div>
+
+
+  <!-- NEURAL CONTROLS -->
 
   <div class="neuralButtons">
 
@@ -105,30 +212,56 @@
 
   </div>
 
+
+  <!-- NEURAL CANVAS -->
+
   <canvas id="brain"></canvas>
 
 </div>
 
 
-<!-- HAND TRACKING -->
+
+<!-- =========================
+     HAND TRACKING
+========================= -->
 
 <div id="handUI">
 
-  <video id="video" autoplay playsinline></video>
+  <video
+    id="video"
+    autoplay
+    playsinline>
+  </video>
+
 
   <canvas id="handCanvas"></canvas>
 
+
   <div class="handInfo">
-    <b>HAND TRACKING</b>
+
+    <b>
+      HAND TRACKING
+    </b>
+
     <br>
-    <span id="gesture">SEARCHING FOR HAND...</span>
+
+    <span id="gesture">
+      SEARCHING FOR HAND...
+    </span>
+
   </div>
 
-  <button class="closeHand" onclick="stopHands()">
+
+  <button
+    class="closeHand"
+    onclick="stopHands()">
+
     ✕
+
   </button>
 
 </div>
+
 
 
 <script src="script.js"></script>
