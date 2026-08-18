@@ -1,394 +1,200 @@
-/* ==================================
-   FRIDAY MK 2.2
-   ORANGE FUTURISTIC HUD
-================================== */
-
 *{
   box-sizing:border-box;
-  -webkit-tap-highlight-color:transparent;
 }
 
-
-html,
-body{
+html,body{
   margin:0;
   width:100%;
   height:100%;
 }
 
-
 body{
 
-  background:#030201;
-
-  color:#ff6500;
+  background:#020509;
+  color:#168cff;
 
   font-family:
-    Arial,
-    Helvetica,
-    sans-serif;
+  Arial,Helvetica,sans-serif;
 
   overflow:hidden;
 
   transition:
-    background 1s ease,
-    color 1s ease;
+  background 1s,
+  color 1s;
 }
-
-
-/* ==================================
-   HOLOGRAPHIC SCANLINES
-================================== */
 
 body::before{
 
   content:"";
 
   position:fixed;
-
   inset:0;
 
   pointer-events:none;
+
+  background:
+  repeating-linear-gradient(
+    0deg,
+    transparent 0 4px,
+    rgba(255,255,255,.025) 5px
+  );
 
   z-index:100;
-
-  background:
-    repeating-linear-gradient(
-      0deg,
-      transparent 0px,
-      transparent 4px,
-      rgba(255,90,0,.025) 5px
-    );
-
 }
 
 
-/* ==================================
-   SCREEN GLOW
-================================== */
-
-body::after{
-
-  content:"";
-
-  position:fixed;
-
-  inset:0;
-
-  pointer-events:none;
-
-  background:
-    radial-gradient(
-      circle at center,
-      rgba(255,80,0,.08),
-      transparent 55%
-    );
-
-}
-
-
-/* ==================================
-   MAIN APP
-================================== */
-
-#app{
-
-  min-height:100vh;
-
-  padding:16px;
-
-  position:relative;
-
-  z-index:2;
-
-  transition:
-    1s ease;
-
-}
-
-
-/* ==================================
-   HEADER
-================================== */
+/* HEADER */
 
 header{
 
-  display:flex;
+  height:70px;
 
+  padding:12px 18px;
+
+  display:flex;
+  align-items:center;
   justify-content:space-between;
 
-  align-items:center;
-
-  padding-bottom:12px;
-
   border-bottom:
-    1px solid currentColor;
+  1px solid currentColor;
 
+  position:relative;
+  z-index:5;
 }
-
 
 header small{
 
+  font-size:8px;
   letter-spacing:4px;
-
-  font-size:9px;
-
-  opacity:.55;
-
+  opacity:.5;
 }
 
+h1{
 
-header h2{
-
-  margin:5px 0 0;
+  margin:4px 0;
 
   font-size:20px;
-
   letter-spacing:3px;
 
   text-shadow:
-    0 0 8px currentColor,
-    0 0 20px currentColor;
+  0 0 10px currentColor;
+}
 
+h1 span{
+
+  font-size:8px;
+
+  border:1px solid currentColor;
+
+  padding:4px;
 }
 
 
-header span{
-
-  font-size:9px;
-
-  padding:4px 6px;
-
-  border:
-    1px solid currentColor;
-
-  margin-left:5px;
-
-  letter-spacing:1px;
-
-}
-
-
-/* ==================================
-   GENERAL BUTTON
-================================== */
+/* BUTTONS */
 
 button{
 
-  border:
-    1px solid #ff6500;
+  color:inherit;
 
   background:
-    rgba(20,5,0,.75);
+  rgba(5,15,30,.75);
 
-  color:#ff6500;
+  border:
+  1px solid currentColor;
 
-  border-radius:10px;
+  border-radius:8px;
 
-  padding:10px;
+  padding:10px 13px;
 
   font-weight:bold;
 
+  box-shadow:
+  0 0 10px
+  rgba(0,120,255,.25);
+
   cursor:pointer;
 
-  box-shadow:
-    0 0 8px rgba(255,80,0,.25),
-    inset 0 0 12px rgba(255,80,0,.08);
-
-  transition:
-    .3s ease;
-
+  transition:.3s;
 }
-
-
-button:hover{
-
-  background:
-    rgba(255,80,0,.12);
-
-  box-shadow:
-    0 0 18px #ff6500,
-    inset 0 0 15px rgba(255,80,0,.15);
-
-}
-
 
 button:active{
-
-  transform:scale(.92);
-
+  transform:scale(.9);
 }
 
 
-/* ==================================
-   FRIDAY HUD
-================================== */
+/* CORE */
+
+.coreArea{
+
+  height:390px;
+
+  display:flex;
+
+  flex-direction:column;
+
+  align-items:center;
+  justify-content:center;
+}
 
 .hud{
 
-  height:360px;
-
-  display:grid;
-
-  place-items:center;
-
-  position:relative;
-
-  perspective:800px;
-
-}
-
-
-/* ==================================
-   MAIN CORE
-================================== */
-
-.fridayCore{
-
   width:300px;
-
   height:300px;
 
   position:relative;
 
   display:grid;
-
   place-items:center;
-
-  transform:
-    rotateX(10deg);
-
-  filter:
-    drop-shadow(
-      0 0 15px #ff6500
-    )
-    drop-shadow(
-      0 0 40px rgba(255,70,0,.55)
-    );
-
 }
 
 
-/* ==================================
-   HUD RINGS
-================================== */
+/* RINGS */
 
-.hudRing{
+.ring{
 
   position:absolute;
 
   border-radius:50%;
 
   border:
-    2px solid rgba(
-      255,
-      100,
-      0,
-      .45
-    );
+  2px solid currentColor;
 
   box-shadow:
-    0 0 8px #ff6500,
-    inset 0 0 8px rgba(
-      255,
-      80,
-      0,
-      .25
-    );
-
+  0 0 12px currentColor,
+  inset 0 0 10px currentColor;
 }
 
-
-/* ==================================
-   OUTER RING
-================================== */
-
-.ringOuter{
+.outer{
 
   width:300px;
-
   height:300px;
 
   animation:
-    rotateClockwise
-    9s
-    linear
-    infinite;
-
+  rotate 9s linear infinite;
 }
 
-
-/* ==================================
-   MIDDLE RING
-================================== */
-
-.ringMiddle{
+.middle{
 
   width:230px;
-
   height:230px;
 
-  animation:
-    rotateReverse
-    6s
-    linear
-    infinite;
-
-}
-
-
-/* ==================================
-   INNER RING
-================================== */
-
-.ringInner{
-
-  width:170px;
-
-  height:170px;
+  border-style:dashed;
 
   animation:
-    rotateClockwise
-    4s
-    linear
-    infinite;
+  reverseRotate 6s linear infinite;
+}
 
+.inner{
+
+  width:165px;
+  height:165px;
+
+  animation:
+  rotate 3s linear infinite;
 }
 
 
-/* ==================================
-   ROTATIONS
-================================== */
-
-@keyframes rotateClockwise{
-
-  from{
-    transform:rotate(0deg);
-  }
-
-  to{
-    transform:rotate(360deg);
-  }
-
-}
-
-
-@keyframes rotateReverse{
-
-  from{
-    transform:rotate(360deg);
-  }
-
-  to{
-    transform:rotate(0deg);
-  }
-
-}
-
-
-/* ==================================
-   ORANGE SEGMENTS
-================================== */
+/* ORANGE ARCS */
 
 .arc{
 
@@ -396,285 +202,140 @@ button:active{
 
   border-radius:50%;
 
-  border:
-    7px solid transparent;
-
+  border:8px solid transparent;
 }
-
-
-/* OUTER ARC 1 */
 
 .arc1{
 
-  inset:-2px;
+  width:275px;
+  height:275px;
 
-  border-top-color:#ff6500;
+  border-top-color:currentColor;
+  border-right-color:currentColor;
 
-  border-right-color:#ff6500;
-
-  filter:
-    drop-shadow(
-      0 0 8px #ff6500
-    );
-
+  animation:
+  reverseRotate 4s linear infinite;
 }
-
-
-/* OUTER ARC 2 */
 
 .arc2{
 
-  inset:20px;
+  width:205px;
+  height:205px;
 
-  border-bottom-color:#ff7b00;
+  border-left-color:currentColor;
+  border-bottom-color:currentColor;
 
-  transform:
-    rotate(110deg);
-
-  filter:
-    drop-shadow(
-      0 0 8px #ff6500
-    );
-
+  animation:
+  rotate 5s linear infinite;
 }
 
 
-/* MIDDLE ARC */
+/* CENTER */
 
-.arc3{
-
-  inset:-2px;
-
-  border-left-color:#ff6a00;
-
-  border-bottom-color:#ff6a00;
-
-  filter:
-    drop-shadow(
-      0 0 8px #ff6500
-    );
-
-}
-
-
-/* MIDDLE SECOND ARC */
-
-.arc4{
-
-  inset:25px;
-
-  border-top-color:#ff8a00;
-
-  transform:
-    rotate(80deg);
-
-  filter:
-    drop-shadow(
-      0 0 10px #ff6500
-    );
-
-}
-
-
-/* INNER ARC */
-
-.arc5{
-
-  inset:0;
-
-  border-right-color:#ff7000;
-
-  border-top-color:#ff7000;
-
-  filter:
-    drop-shadow(
-      0 0 10px #ff6500
-    );
-
-}
-
-
-/* ==================================
-   CENTER CORE
-================================== */
-
-.centerCore{
+.core{
 
   width:105px;
-
   height:105px;
-
-  position:relative;
-
-  display:grid;
-
-  place-items:center;
 
   border-radius:50%;
 
-  background:
+  display:grid;
+  place-items:center;
 
-    radial-gradient(
-      circle,
-      #421500 0%,
-      #1b0800 55%,
-      #050202 100%
-    );
+  position:relative;
+
+  background:#020509;
 
   border:
-    2px solid #ff6500;
+  2px solid currentColor;
 
   box-shadow:
 
-    0 0 10px #ff6500,
-
-    0 0 30px #ff6500,
-
-    0 0 60px
-      rgba(255,80,0,.5),
-
-    inset 0 0 25px #ff6500;
+  0 0 15px currentColor,
+  0 0 40px currentColor,
+  inset 0 0 25px currentColor;
 
   z-index:5;
-
 }
 
+.core b{
 
-/* ==================================
-   FRIDAY TEXT
-================================== */
+  color:white;
 
-.coreText{
-
-  color:#fff;
-
-  font-size:19px;
-
-  font-weight:bold;
+  font-size:17px;
 
   letter-spacing:2px;
 
-  z-index:3;
-
   text-shadow:
-
-    0 0 5px white,
-
-    0 0 15px #ff6500,
-
-    0 0 30px #ff4500;
-
+  0 0 10px currentColor,
+  0 0 20px currentColor;
 }
 
 
-/* ==================================
-   PULSING CORE
-================================== */
+/* CORE PULSE */
 
-.corePulse{
+.pulse{
 
   position:absolute;
 
   width:45px;
-
   height:45px;
 
   border-radius:50%;
 
-  background:#ff6500;
+  background:currentColor;
 
-  opacity:.15;
-
-  box-shadow:
-    0 0 30px #ff6500;
+  opacity:.2;
 
   animation:
-    corePulse
-    1.2s
-    ease-in-out
-    infinite;
-
+  pulse 1.4s infinite;
 }
 
-
-@keyframes corePulse{
-
-  0%,
-  100%{
-
-    transform:
-      scale(.7);
-
-    opacity:.15;
-
-  }
+@keyframes pulse{
 
   50%{
-
-    transform:
-      scale(1.5);
-
-    opacity:.4;
-
+    transform:scale(1.7);
+    opacity:.5;
   }
 
 }
 
 
-/* ==================================
-   OUTER SCANNER
-================================== */
+/* ROTATION */
 
-.fridayCore::after{
+@keyframes rotate{
 
-  content:"";
+  to{
+    transform:rotate(360deg);
+  }
 
-  position:absolute;
+}
 
-  width:320px;
+@keyframes reverseRotate{
 
-  height:320px;
-
-  border-radius:50%;
-
-  border-top:
-    3px solid #ff8a00;
-
-  animation:
-    rotateClockwise
-    2.5s
-    linear
-    infinite;
-
-  filter:
-    drop-shadow(
-      0 0 10px #ff6500
-    );
+  to{
+    transform:rotate(-360deg);
+  }
 
 }
 
 
-/* ==================================
-   STATUS
-================================== */
+/* STATUS */
 
 #status{
 
-  text-align:center;
+  margin-top:12px;
 
-  font-size:11px;
+  font-size:10px;
 
   letter-spacing:4px;
 
   text-shadow:
-    0 0 12px currentColor;
-
+  0 0 12px currentColor;
 }
 
 
-/* ==================================
-   CONTROL BUTTONS
-================================== */
+/* CONTROLS */
 
 .controls{
 
@@ -684,126 +345,86 @@ button:active{
 
   flex-wrap:wrap;
 
-  gap:7px;
-
-  margin:
-    12px 0;
+  gap:8px;
 
 }
-
 
 .controls button{
 
   width:90px;
-
-  height:68px;
+  height:65px;
 
   display:flex;
 
   flex-direction:column;
 
-  align-items:center;
-
   justify-content:center;
 
+  align-items:center;
+
   gap:5px;
-
 }
-
 
 .controls small{
-
   font-size:8px;
-
-  letter-spacing:1px;
-
 }
 
 
-/* ==================================
-   COMMAND
-================================== */
+/* COMMAND */
 
 .command{
 
   max-width:650px;
 
-  margin:
-    18px auto;
+  margin:18px auto;
+
+  padding:0 15px;
 
   display:flex;
 
   gap:5px;
-
 }
 
-
-input{
+.command input{
 
   flex:1;
 
   min-width:0;
 
-  padding:14px;
+  background:#020509;
 
-  border-radius:10px;
+  color:white;
 
   border:
-    1px solid #ff6500;
+  1px solid currentColor;
 
-  background:#050201;
+  border-radius:8px;
 
-  color:#fff;
+  padding:13px;
 
   outline:none;
+}
 
+.command input:disabled{
+  opacity:.35;
 }
 
 
-input::placeholder{
-
-  color:
-    rgba(255,120,40,.5);
-
-}
-
-
-input:focus{
-
-  box-shadow:
-    0 0 18px #ff6500;
-
-}
-
-
-/* ==================================
-   REPLY
-================================== */
+/* REPLY */
 
 #reply{
 
   text-align:center;
 
-  min-height:25px;
+  font-size:12px;
 
-  max-width:800px;
-
-  margin:auto;
-
-  opacity:.85;
-
-  font-size:13px;
-
-  line-height:1.5;
-
+  opacity:.7;
 }
 
 
-/* ==================================
-   NEURAL SYSTEM
-================================== */
+/* NEURAL SCREEN */
 
-#neural{
+#neuralScreen{
 
   display:none;
 
@@ -811,37 +432,23 @@ input:focus{
 
   inset:0;
 
-  z-index:10;
-
   background:
+  radial-gradient(
+    circle,
+    #101b2a,
+    #020509 70%
+  );
 
-    radial-gradient(
-      circle at center,
-      #251000,
-      #050200 55%,
-      #000 100%
-    );
-
-  color:#ff8a00;
-
+  z-index:20;
 }
 
-
-/* ==================================
-   NEURAL HEADER
-================================== */
-
-.neuralTop{
+.neuralHeader{
 
   position:absolute;
 
-  top:12px;
-
+  top:15px;
   left:15px;
-
   right:15px;
-
-  z-index:20;
 
   display:flex;
 
@@ -849,85 +456,52 @@ input:focus{
 
   align-items:center;
 
+  z-index:10;
 }
 
-
-.neuralTop small{
+.neuralHeader small{
 
   letter-spacing:3px;
 
   opacity:.5;
-
 }
 
-
-.neuralTop h1{
+.neuralHeader h2{
 
   margin:4px 0;
 
-  letter-spacing:4px;
+  letter-spacing:3px;
 
   text-shadow:
-    0 0 10px #ff6500,
-    0 0 25px #ff6500;
-
+  0 0 15px currentColor;
 }
 
-
-/* ==================================
-   NEURAL BUTTONS
-================================== */
-
-.neuralButtons{
-
-  position:absolute;
-
-  top:90px;
-
-  left:15px;
-
-  z-index:20;
-
-  display:flex;
-
-  gap:5px;
-
-  flex-wrap:wrap;
-
-}
-
-
-.neuralButtons button{
-
-  color:#ff8a00;
-
-  border-color:#ff6500;
-
-}
-
-
-/* ==================================
-   BRAIN CANVAS
-================================== */
-
-#brain{
-
-  position:absolute;
-
-  inset:0;
+#neuralCanvas{
 
   width:100%;
-
   height:100%;
+}
 
+.neuralInfo{
+
+  position:absolute;
+
+  bottom:20px;
+
+  left:20px;
+
+  letter-spacing:2px;
+
+  font-size:11px;
+
+  text-shadow:
+  0 0 10px currentColor;
 }
 
 
-/* ==================================
-   HAND TRACKING
-================================== */
+/* CAMERA */
 
-#handUI{
+#cameraBox{
 
   display:none;
 
@@ -938,29 +512,21 @@ input:focus{
   background:#000;
 
   z-index:30;
-
 }
-
 
 #video{
 
   position:absolute;
 
-  inset:0;
-
   width:100%;
-
   height:100%;
 
   object-fit:cover;
 
-  transform:
-    scaleX(-1);
+  transform:scaleX(-1);
 
-  opacity:.25;
-
+  opacity:.3;
 }
-
 
 #handCanvas{
 
@@ -969,13 +535,10 @@ input:focus{
   inset:0;
 
   width:100%;
-
   height:100%;
-
 }
 
-
-.handInfo{
+#cameraBox>div{
 
   position:absolute;
 
@@ -985,293 +548,236 @@ input:focus{
 
   text-align:center;
 
-  letter-spacing:3px;
-
-  color:#ff7b00;
+  color:#ff6500;
 
   text-shadow:
-    0 0 15px #ff6500;
-
+  0 0 15px #ff6500;
 }
 
-
-.handInfo span{
-
-  font-size:11px;
-
-}
-
-
-.closeHand{
+#closeHand{
 
   position:absolute;
 
   right:15px;
-
   bottom:20px;
-
 }
 
 
-/* ==================================
-   LOCKED BLUE MODE
-================================== */
+/* LOGIN */
 
-body.locked{
+#loginPanel{
 
-  color:#158cff;
+  display:none;
 
-}
+  position:fixed;
 
+  inset:0;
 
-body.locked::after{
+  z-index:50;
+
+  place-items:center;
 
   background:
+  rgba(0,0,0,.8);
 
-    radial-gradient(
-      circle at center,
-      rgba(0,100,255,.07),
-      transparent 55%
-    );
-
+  backdrop-filter:blur(10px);
 }
 
+.loginBox{
 
-/* BLUE CORE */
+  width:min(350px,90%);
 
-body.locked .fridayCore{
+  padding:30px;
 
-  filter:
+  text-align:center;
 
-    drop-shadow(
-      0 0 15px #087cff
-    )
+  background:#020509;
 
-    drop-shadow(
-      0 0 40px
-      rgba(0,120,255,.55)
-    );
-
-}
-
-
-/* BLUE RINGS */
-
-body.locked .hudRing{
-
-  border-color:
-    rgba(0,130,255,.45);
+  border:
+  1px solid currentColor;
 
   box-shadow:
-    0 0 8px #087cff,
-    inset 0 0 8px
-    rgba(0,120,255,.25);
-
+  0 0 35px currentColor;
 }
 
+#closeLogin{
 
-/* BLUE ARCS */
+  float:right;
 
-body.locked .arc{
-
-  border-color:transparent;
-
-  border-top-color:#168cff;
-
-  filter:
-    drop-shadow(
-      0 0 8px #087cff
-    );
-
+  padding:5px 8px;
 }
 
+.loginLogo{
 
-/* BLUE CORE */
+  width:65px;
+  height:65px;
 
-body.locked .centerCore{
+  margin:10px auto;
 
-  border-color:#168cff;
+  display:grid;
+  place-items:center;
+
+  border-radius:50%;
+
+  border:
+  2px solid currentColor;
 
   box-shadow:
+  0 0 25px currentColor;
 
-    0 0 15px #168cff,
+  font-size:30px;
+}
 
-    0 0 40px #087cff,
+.loginBox h2{
 
-    inset 0 0 25px #087cff;
+  letter-spacing:3px;
+}
 
+.loginBox input{
+
+  width:100%;
+
+  margin:6px 0;
+
+  padding:12px;
+
+  background:#000;
+
+  color:white;
+
+  border:
+  1px solid currentColor;
+
+  outline:none;
+}
+
+#loginSubmit{
+  width:100%;
+  margin-top:10px;
 }
 
 
-body.locked .corePulse{
+/* TRANSITION */
 
-  background:#087cff;
+#transition{
 
-  box-shadow:
-    0 0 30px #087cff;
+  position:fixed;
 
+  width:20px;
+  height:20px;
+
+  border-radius:50%;
+
+  left:50%;
+  top:50%;
+
+  transform:
+  translate(-50%,-50%)
+  scale(0);
+
+  background:#ff6500;
+
+  z-index:80;
+
+  pointer-events:none;
 }
 
-
-body.locked .coreText{
-
-  text-shadow:
-
-    0 0 8px #168cff,
-
-    0 0 20px #087cff;
-
-}
-
-
-/* ==================================
-   UNLOCK ANIMATION
-================================== */
-
-body.unlocked .fridayCore{
+body.unlocking #transition{
 
   animation:
-    unlockGlow
-    1.2s
-    ease;
-
+  circularTransition
+  1.5s
+  ease-in-out;
 }
 
-
-@keyframes unlockGlow{
+@keyframes circularTransition{
 
   0%{
-
     transform:
-      rotateX(10deg)
-      scale(.75);
-
-    filter:
-      brightness(3)
-      drop-shadow(
-        0 0 80px #ff6500
-      );
-
+    translate(-50%,-50%)
+    scale(0);
   }
 
-  60%{
-
+  45%{
     transform:
-      rotateX(10deg)
-      scale(1.12);
+    translate(-50%,-50%)
+    scale(25);
+  }
 
-    filter:
-      brightness(2)
-      drop-shadow(
-        0 0 70px #ff6500
-      );
-
+  70%{
+    transform:
+    translate(-50%,-50%)
+    scale(25);
   }
 
   100%{
-
     transform:
-      rotateX(10deg)
-      scale(1);
-
-    filter:
-      brightness(1)
-      drop-shadow(
-        0 0 40px #ff6500
-      );
-
+    translate(-50%,-50%)
+    scale(0);
   }
 
 }
 
 
-/* ==================================
-   MOBILE
-================================== */
+/* ORANGE ONLINE */
+
+body.online{
+
+  color:#ff6500;
+
+  background:#090300;
+}
+
+body.online .core{
+
+  background:#160700;
+
+  box-shadow:
+  0 0 15px #ff6500,
+  0 0 45px #ff6500,
+  inset 0 0 25px #ff6500;
+}
+
+body.online button{
+
+  box-shadow:
+  0 0 12px
+  rgba(255,90,0,.35);
+}
+
+
+/* MOBILE */
 
 @media(max-width:500px){
 
-  #app{
-
-    padding:12px;
-
-  }
-
-
   .hud{
-
-    height:310px;
-
+    width:260px;
+    height:260px;
   }
 
-
-  .fridayCore{
-
-    width:250px;
-
-    height:250px;
-
+  .outer{
+    width:260px;
+    height:260px;
   }
 
-
-  .ringOuter{
-
-    width:250px;
-
-    height:250px;
-
+  .middle{
+    width:200px;
+    height:200px;
   }
 
-
-  .ringMiddle{
-
-    width:195px;
-
-    height:195px;
-
-  }
-
-
-  .ringInner{
-
+  .inner{
     width:145px;
-
     height:145px;
-
   }
 
-
-  .fridayCore::after{
-
-    width:270px;
-
-    height:270px;
-
+  .arc1{
+    width:235px;
+    height:235px;
   }
 
-
-  .controls button{
-
-    width:78px;
-
-    height:64px;
-
-  }
-
-
-  .coreText{
-
-    font-size:16px;
-
-  }
-
-
-  .centerCore{
-
-    width:90px;
-
-    height:90px;
-
+  .arc2{
+    width:180px;
+    height:180px;
   }
 
 }
