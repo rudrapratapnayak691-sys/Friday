@@ -1,715 +1,776 @@
 let locked=true;
-let neuralAnimation;
+let camera=null;
+let hands=null;
+
+let brainAnimation=null;
+let nodes=[];
+let zoom=1;
+let panX=0;
+let panY=0;
 
 const $=id=>document.getElementById(id);
 
 
-/* VOICE */
+/* =========================
+   VOICE
+========================= */
 
 function speak(text){
 
-$("reply").textContent=
-"FRIDAY: "+text;
+ $("reply").textContent="FRIDAY: "+text;
 
-speechSynthesis.cancel();
+ speechSynthesis.cancel();
 
-let u=
-new SpeechSynthesisUtterance(text);
+ let voices=speechSynthesis.getVoices();
 
-u.lang="en-US";
-u.rate=.82;
-u.pitch=.55;
-u.volume=1;
+ let female=
+ voices.find(v =>
+  /female|samantha|zira|google us english/i
+  .test(v.name)
+ );
 
-speechSynthesis.speak(u);
+ let v=female || voices[0];
+
+ let u=new SpeechSynthesisUtterance(text);
+
+ u.voice=v;
+ u.lang="en-US";
+
+ /* deeper, slower voice */
+ u.rate=.84;
+ u.pitch=.72;
+ u.volume=1;
+
+ speechSynthesis.speak(u);
 }
 
 
-/* LOCK */
+/* =========================
+   LOCK / UNLOCK
+========================= */
 
 function toggleLock(){
 
-locked=!locked;
+ locked=!locked;
 
-document.querySelector(
-"header button"
-).textContent=
-locked?"🔒":"🔓";
+ if(locked){
 
-$("status").textContent=
-locked?
-"SYSTEM LOCKED":
-"SYSTEM ONLINE";
+  document.body.classList.remove("unlocked");
 
-speak(
-locked?
-"Systems locked.":
-"Systems online."
-);
+  $("lockBtn").textContent="🔒";
+
+  $("status").textContent=
+   "SYSTEM LOCKED";
+
+  $("unlockBtn").innerHTML=
+   "🔓<small>UNLOCK</small>";
+
+  speak("Systems locked.");
+
+ }else{
+
+  document.body.classList.add("unlocked");
+
+  $("lockBtn").textContent="🔓";
+
+  $("status").textContent=
+   "SYSTEM ONLINE";
+
+  $("unlockBtn").innerHTML=
+   "🔒<small>LOCK</small>";
+
+  speak("Systems online.");
+ }
 }
 
 
-/* COMMAND SYSTEM */
+/* =========================
+   COMMANDS
+========================= */
 
 function run(){
 
-let text=
-$("cmd").value.trim();
+ let text=$("cmd").value.trim();
 
-if(!text)return;
+ if(!text)return;
 
-let q=text.toLowerCase();
+ let q=text.toLowerCase();
 
 
-if(q==="unlock" ||
-q.includes("unlock friday")){
+ /* unlock */
 
-locked=false;
+ if(
+  q==="unlock" ||
+  q.includes("unlock friday") ||
+  q.includes("wake up friday")
+ ){
 
-$("status").textContent=
-"SYSTEM ONLINE";
+  if(locked)
+   toggleLock();
 
-speak("Systems online.");
+  return;
+ }
 
-return;
+
+ /* lock */
+
+ if(
+  q==="lock" ||
+  q.includes("lock friday")
+ ){
+
+  if(!locked)
+   toggleLock();
+
+  return;
+ }
+
+
+ /* greeting */
+
+ if(
+  q==="hello" ||
+  q.includes("hello friday") ||
+  q.includes("hi friday") ||
+  q.includes("hey friday")
+ ){
+
+  speak(
+   "Hello. I'm FRIDAY. Systems are ready."
+  );
+
+  return;
+ }
+
+
+ /* neural question */
+
+ if(
+  q.includes("how are neural systems updated") ||
+  q.includes("how are neural systems updated")
+ ){
+
+  speak(
+   "Neural systems are updated by improving their architecture, training data, algorithms, and processing connections."
+  );
+
+  return;
+ }
+
+
+ if(
+  q.includes("show neural") ||
+  q.includes("neural system")
+ ){
+
+  showNeural();
+
+  return;
+ }
+
+
+ if(q.includes("exit neural")){
+
+  hideNeural();
+
+  return;
+ }
+
+
+ if(locked){
+
+  speak(
+   "Please unlock me first."
+  );
+
+  return;
+ }
+
+
+ /* websites */
+
+ if(q.startsWith("open ")){
+
+  let name=
+   q.substring(5).trim();
+
+  let sites={
+
+   youtube:"https://youtube.com",
+
+   chatgpt:"https://chatgpt.com",
+
+   google:"https://google.com",
+
+   github:"https://github.com",
+
+   instagram:"https://instagram.com",
+
+   roblox:"https://roblox.com",
+
+   whatsapp:"https://web.whatsapp.com"
+
+  };
+
+  let url=sites[name];
+
+  if(!url){
+
+   url=name.startsWith("http")
+    ?name
+    :"https://"+name;
+  }
+
+  speak("Opening "+name);
+
+  setTimeout(
+   ()=>window.open(url,"_blank"),
+   500
+  );
+
+  return;
+ }
+
+
+ /* google */
+
+ if(q.startsWith("search ")){
+
+  google(text.substring(7));
+
+  return;
+ }
+
+
+ google(text);
 }
 
 
-if(q==="lock" ||
-q.includes("lock friday")){
-
-locked=true;
-
-$("status").textContent=
-"SYSTEM LOCKED";
-
-speak("Systems locked.");
-
-return;
-}
-
-
-if(locked){
-
-speak(
-"Please unlock me first."
-);
-
-return;
-}
-
-
-/* NEURAL */
-
-if(q.includes("show neural") ||
-q.includes("neural system")){
-
-showNeural();
-
-return;
-}
-
-
-if(q.includes("exit neural")){
-
-hideNeural();
-
-return;
-}
-
-
-/* OPEN WEBSITES */
-
-if(q.startsWith("open ")){
-
-let name=
-q.substring(5).trim();
-
-let sites={
-
-youtube:
-"https://youtube.com",
-
-chatgpt:
-"https://chatgpt.com",
-
-google:
-"https://google.com",
-
-github:
-"https://github.com",
-
-instagram:
-"https://instagram.com",
-
-roblox:
-"https://roblox.com",
-
-whatsapp:
-"https://web.whatsapp.com"
-
-};
-
-let url=sites[name];
-
-if(!url){
-
-url=name.startsWith("http")?
-name:
-"https://"+name;
-
-}
-
-speak(
-"Opening "+name
-);
-
-setTimeout(()=>{
-
-window.open(
-url,
-"_blank"
-);
-
-},600);
-
-return;
-}
-
-
-/* SEARCH */
-
-if(q.startsWith("search ")){
-
-google(
-text.substring(7)
-);
-
-return;
-}
-
-
-/* NORMAL QUESTION */
-
-google(text);
-
-}
-
-
-/* GOOGLE */
+/* =========================
+   GOOGLE
+========================= */
 
 function google(text){
 
-speak(
-"Searching Google."
-);
+ speak("Searching Google.");
 
-setTimeout(()=>{
+ setTimeout(()=>{
 
-window.open(
+  window.open(
+   "https://www.google.com/search?q="+
+   encodeURIComponent(text),
+   "_blank"
+  );
 
-"https://www.google.com/search?q="+
-encodeURIComponent(text),
-
-"_blank"
-
-);
-
-},600);
-
+ },600);
 }
 
 
-/* VOICE */
+/* =========================
+   VOICE RECOGNITION
+========================= */
 
 function voice(){
 
-if(!("webkitSpeechRecognition"
-in window)){
+ if(
+  !("webkitSpeechRecognition"
+  in window)
+ ){
 
-speak(
-"Voice recognition is not supported."
-);
+  speak(
+   "Voice recognition is not supported."
+  );
 
-return;
+  return;
+ }
 
+ let r=
+  new webkitSpeechRecognition();
+
+ r.lang="en-US";
+ r.continuous=false;
+
+ $("status").textContent=
+  "LISTENING...";
+
+ r.start();
+
+ r.onresult=e=>{
+
+  let text=
+   e.results[0][0].transcript;
+
+  $("cmd").value=text;
+
+  run();
+
+ };
+
+ r.onend=()=>{
+
+  if(!locked)
+   $("status").textContent=
+    "SYSTEM ONLINE";
+  else
+   $("status").textContent=
+    "SYSTEM LOCKED";
+ };
 }
 
-let r=
-new webkitSpeechRecognition();
 
-r.lang="en-US";
-
-$("status").textContent=
-"LISTENING...";
-
-r.start();
-
-r.onresult=e=>{
-
-let text=
-e.results[0][0].transcript;
-
-$("cmd").value=text;
-
-run();
-
-};
-
-}
-
-
-/* NEURAL SYSTEM */
+/* =========================
+   NEURAL SYSTEM
+========================= */
 
 function showNeural(){
 
-if(locked){
+ if(locked){
 
-speak(
-"Unlock me to access the neural system."
-);
+  speak(
+   "Unlock me to access the neural system."
+  );
 
-return;
+  return;
+ }
 
-}
+ $("neural").style.display="block";
 
-$("ui").style.display="none";
-
-$("neural").style.display="block";
-
-createNeural();
-
+ createBrain();
 }
 
 
 function hideNeural(){
 
-$("neural").style.display="none";
+ $("neural").style.display="none";
 
-$("ui").style.display="block";
-
-cancelAnimationFrame(
-neuralAnimation
-);
-
+ cancelAnimationFrame(
+  brainAnimation
+ );
 }
 
 
-/* ANIMATED NEURAL NETWORK */
+function createBrain(){
 
-function createNeural(){
+ let c=$("brain");
+ let ctx=c.getContext("2d");
 
-let canvas=
-$("brain");
+ c.width=innerWidth;
+ c.height=innerHeight;
 
-let ctx=
-canvas.getContext("2d");
+ nodes=[];
 
-canvas.width=
-innerWidth;
+ for(let i=0;i<130;i++){
 
-canvas.height=
-innerHeight*.82;
+  nodes.push({
+
+   x:Math.random()*c.width,
+   y:Math.random()*c.height,
+
+   vx:(Math.random()-.5)*1.2,
+   vy:(Math.random()-.5)*1.2,
+
+   pulse:Math.random()*10
+  });
+ }
 
 
-let nodes=[];
+ function draw(){
 
-for(let i=0;i<130;i++){
+  ctx.clearRect(
+   0,0,c.width,c.height
+  );
 
-nodes.push({
+  ctx.save();
 
-x:Math.random()*canvas.width,
+  ctx.translate(
+   c.width/2+panX,
+   c.height/2+panY
+  );
 
-y:Math.random()*canvas.height,
+  ctx.scale(zoom,zoom);
 
-vx:(Math.random()-.5)*1.4,
+  ctx.translate(
+   -c.width/2,
+   -c.height/2
+  );
 
-vy:(Math.random()-.5)*1.4,
 
-pulse:Math.random()*10
+  /* connections */
 
-});
+  for(let a of nodes){
 
+   for(let b of nodes){
+
+    let d=Math.hypot(
+     a.x-b.x,
+     a.y-b.y
+    );
+
+    if(d<115){
+
+     ctx.strokeStyle=
+      "rgba(255,216,74,"+
+      ((1-d/115)*.35)+
+      ")";
+
+     ctx.beginPath();
+
+     ctx.moveTo(
+      a.x,a.y
+     );
+
+     ctx.lineTo(
+      b.x,b.y
+     );
+
+     ctx.stroke();
+    }
+   }
+  }
+
+
+  /* neurons */
+
+  for(let n of nodes){
+
+   n.x+=n.vx;
+   n.y+=n.vy;
+
+   n.pulse+=.08;
+
+   if(
+    n.x<0 ||
+    n.x>c.width
+   )n.vx*=-1;
+
+   if(
+    n.y<0 ||
+    n.y>c.height
+   )n.vy*=-1;
+
+   let s=
+    3+Math.sin(n.pulse);
+
+   ctx.shadowBlur=18;
+   ctx.shadowColor="#ffd84a";
+
+   ctx.fillStyle="#ffd84a";
+
+   ctx.beginPath();
+
+   ctx.arc(
+    n.x,
+    n.y,
+    s,
+    0,
+    Math.PI*2
+   );
+
+   ctx.fill();
+  }
+
+
+  /* CENTRAL CORE */
+
+  ctx.shadowBlur=45;
+  ctx.shadowColor="#ffd84a";
+  ctx.fillStyle="#ffd84a";
+
+  ctx.beginPath();
+
+  ctx.arc(
+   c.width/2,
+   c.height/2,
+   28,
+   0,
+   Math.PI*2
+  );
+
+  ctx.fill();
+
+  ctx.restore();
+
+  brainAnimation=
+   requestAnimationFrame(draw);
+ }
+
+ draw();
 }
 
 
-let signals=[];
+/* neural zoom */
 
+function zoomNeural(amount){
 
-function draw(){
+ zoom*=amount;
 
-ctx.clearRect(
-0,0,
-canvas.width,
-canvas.height
-);
-
-
-/* CONNECTIONS */
-
-for(let a of nodes){
-
-for(let b of nodes){
-
-let d=Math.hypot(
-a.x-b.x,
-a.y-b.y
-);
-
-if(d<115){
-
-ctx.strokeStyle=
-"rgba(255,216,61,"+
-(1-d/115)*.4+
-")";
-
-ctx.beginPath();
-
-ctx.moveTo(
-a.x,a.y
-);
-
-ctx.lineTo(
-b.x,b.y
-);
-
-ctx.stroke();
-
-}
-
-}
-
+ zoom=Math.max(
+  .5,
+  Math.min(zoom,3)
+ );
 }
 
 
-/* NEURONS */
+function resetNeural(){
 
-for(let n of nodes){
+ zoom=1;
 
-n.x+=n.vx;
-n.y+=n.vy;
-
-n.pulse+=.08;
-
-if(n.x<0 ||
-n.x>canvas.width)
-n.vx*=-1;
-
-if(n.y<0 ||
-n.y>canvas.height)
-n.vy*=-1;
-
-let size=
-3+Math.sin(n.pulse);
-
-ctx.shadowBlur=18;
-
-ctx.shadowColor="#ffd83d";
-
-ctx.fillStyle="#ffd83d";
-
-ctx.beginPath();
-
-ctx.arc(
-n.x,
-n.y,
-size,
-0,
-Math.PI*2
-);
-
-ctx.fill();
-
+ panX=0;
+ panY=0;
 }
 
 
-/* SIGNALS */
-
-if(Math.random()<.1){
-
-let n=
-nodes[
-Math.floor(
-Math.random()*nodes.length
-)
-];
-
-signals.push({
-
-x:n.x,
-y:n.y,
-life:0
-
-});
-
-}
-
-
-for(let s of signals){
-
-s.x+=2;
-
-s.life++;
-
-ctx.fillStyle="#fff";
-
-ctx.shadowBlur=25;
-
-ctx.shadowColor="#ffd83d";
-
-ctx.beginPath();
-
-ctx.arc(
-s.x,
-s.y,
-4,
-0,
-Math.PI*2
-);
-
-ctx.fill();
-
-}
-
-signals=
-signals.filter(
-s=>s.life<70
-);
-
-
-neuralAnimation=
-requestAnimationFrame(draw);
-
-}
-
-draw();
-
-}
-
-
-/* HAND TRACKING */
-
-let camera;
-let hands;
-
+/* =========================
+   HAND TRACKING
+========================= */
 
 function startHands(){
 
-if(locked){
+ if(locked){
 
-speak(
-"Unlock me before enabling hand tracking."
-);
+  speak(
+   "Unlock me before enabling hand tracking."
+  );
 
-return;
-}
+  return;
+ }
 
-$("handUI").style.display=
-"block";
+ $("handUI").style.display="block";
 
-let video=
-$("video");
+ let video=$("video");
 
-hands=
-new Hands({
+ hands=new Hands({
 
-locateFile:file=>
-`https://cdn.jsdelivr.net/npm/@mediapipe/hands/${file}`
+  locateFile:file=>
+   `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${file}`
 
-});
+ });
 
+ hands.setOptions({
 
-hands.setOptions({
+  maxNumHands:2,
 
-maxNumHands:1,
+  modelComplexity:1,
 
-modelComplexity:1,
+  minDetectionConfidence:.6,
 
-minDetectionConfidence:.6,
+  minTrackingConfidence:.6
 
-minTrackingConfidence:.6
+ });
 
-});
+ hands.onResults(
+  handResults
+ );
 
+ camera=new Camera(
+  video,
+  {
 
-hands.onResults(
-handResults
-);
+   onFrame:async()=>{
 
+    await hands.send({
+     image:video
+    });
 
-camera=
-new Camera(
-video,
-{
+   },
 
-onFrame:async()=>{
+   width:640,
+   height:480
+  }
+ );
 
-await hands.send({
-image:video
-});
+ camera.start();
 
-},
-
-width:640,
-height:480
-
-});
-
-
-camera.start();
-
-speak(
-"Hand tracking online."
-);
-
+ speak(
+  "Hand tracking online."
+ );
 }
 
 
 function stopHands(){
 
-$("handUI").style.display=
-"none";
+ $("handUI").style.display="none";
 
-if(camera){
-
-camera.stop();
-
+ if(camera)
+  camera.stop();
 }
 
-}
 
+/* =========================
+   HAND GESTURES
+========================= */
 
 function handResults(results){
 
-let canvas=
-$("handCanvas");
+ let canvas=
+  $("handCanvas");
 
-let ctx=
-canvas.getContext("2d");
+ let ctx=
+  canvas.getContext("2d");
 
-canvas.width=
-innerWidth;
+ canvas.width=innerWidth;
+ canvas.height=innerHeight;
 
-canvas.height=
-innerHeight;
-
-ctx.clearRect(
-0,0,
-canvas.width,
-canvas.height
-);
+ ctx.clearRect(
+  0,0,
+  canvas.width,
+  canvas.height
+ );
 
 
-if(!results.multiHandLandmarks)
-return;
+ if(
+  !results.multiHandLandmarks
+ ){
+  $("gesture").textContent=
+   "SEARCHING FOR HAND...";
+  return;
+ }
 
 
-for(let hand of
-results.multiHandLandmarks){
-
-/* DRAW NEURAL-LIKE HAND */
-
-for(let p of hand){
-
-let x=
-(1-p.x)*canvas.width;
-
-let y=
-p.y*canvas.height;
-
-ctx.fillStyle="#ffd83d";
-
-ctx.shadowBlur=15;
-
-ctx.shadowColor="#ffd83d";
-
-ctx.beginPath();
-
-ctx.arc(
-x,y,
-5,
-0,
-Math.PI*2
-);
-
-ctx.fill();
-
-}
+ let handsFound=
+  results.multiHandLandmarks;
 
 
-/* INDEX FINGER */
+ /* DRAW HANDS */
 
-let index=hand[8];
+ for(let hand of handsFound){
 
-let x=
-(1-index.x)*canvas.width;
+  for(let p of hand){
 
-let y=
-index.y*canvas.height;
+   let x=
+    (1-p.x)*canvas.width;
 
+   let y=
+    p.y*canvas.height;
 
-/* HOLOGRAPHIC CURSOR */
+   ctx.fillStyle="#ffd84a";
 
-ctx.strokeStyle="#fff";
+   ctx.shadowBlur=15;
 
-ctx.lineWidth=2;
+   ctx.shadowColor="#ffd84a";
 
-ctx.beginPath();
+   ctx.beginPath();
 
-ctx.arc(
-x,y,
-25,
-0,
-Math.PI*2
-);
+   ctx.arc(
+    x,y,
+    5,
+    0,
+    Math.PI*2
+   );
 
-ctx.stroke();
-
-
-/* PINCH */
-
-let thumb=hand[4];
-
-let tx=
-(1-thumb.x)*canvas.width;
-
-let ty=
-thumb.y*canvas.height;
-
-let distance=
-Math.hypot(
-x-tx,
-y-ty
-);
+   ctx.fill();
+  }
+ }
 
 
-if(distance<35){
+ /* ONE HAND */
 
-ctx.strokeStyle="#fff";
+ if(handsFound.length===1){
 
-ctx.beginPath();
+  let h=
+   handsFound[0];
 
-ctx.arc(
-x,y,
-40,
-0,
-Math.PI*2
-);
+  let index=h[8];
+  let thumb=h[4];
 
-ctx.stroke();
+  let x=
+   (1-index.x)*canvas.width;
 
-$("status").textContent=
-"HAND SELECT";
+  let y=
+   index.y*canvas.height;
 
-}
+  let tx=
+   (1-thumb.x)*canvas.width;
 
-else{
+  let ty=
+   thumb.y*canvas.height;
 
-$("status").textContent=
-"HAND TRACKING";
+  let pinch=
+   Math.hypot(
+    x-tx,
+    y-ty
+   );
 
-}
 
-}
+  /* cursor */
 
+  ctx.strokeStyle="#fff";
+
+  ctx.lineWidth=2;
+
+  ctx.beginPath();
+
+  ctx.arc(
+   x,y,
+   25,
+   0,
+   Math.PI*2
+  );
+
+  ctx.stroke();
+
+
+  /* pinch */
+
+  if(pinch<45){
+
+   $("gesture").textContent=
+    "PINCH • SELECT";
+
+   ctx.beginPath();
+
+   ctx.arc(
+    x,y,
+    40,
+    0,
+    Math.PI*2
+   );
+
+   ctx.stroke();
+
+  }else{
+
+   $("gesture").textContent=
+    "INDEX • MOVE";
+  }
+ }
+
+
+ /* TWO HANDS = ZOOM */
+
+ if(handsFound.length===2){
+
+  let a=
+   handsFound[0][8];
+
+  let b=
+   handsFound[1][8];
+
+  let ax=
+   (1-a.x)*canvas.width;
+
+  let ay=
+   a.y*canvas.height;
+
+  let bx=
+   (1-b.x)*canvas.width;
+
+  let by=
+   b.y*canvas.height;
+
+  let distance=
+   Math.hypot(
+    ax-bx,
+    ay-by
+   );
+
+  $("gesture").textContent=
+   "TWO HANDS • ZOOM";
+
+  if(distance>300)
+   zoomNeural(1.01);
+
+  if(distance<150)
+   zoomNeural(.99);
+ }
 }
