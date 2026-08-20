@@ -1,6 +1,5 @@
 /* =========================================
-   FRIDAY MK 2.3
-   LOCK + VOICE + GOOGLE + MAPS + NEURAL
+   FRIDAY MARK 5
 ========================================= */
 
 const $ = id => document.getElementById(id);
@@ -300,6 +299,52 @@ function runCommand(text) {
 
 
     /* =====================================
+       FIXED SONGS
+    ===================================== */
+
+    if (
+        lower.includes("play golden") ||
+        lower.includes("play golden brown")
+    ) {
+
+        playDirect(
+            "Golden Brown",
+            "https://m.youtube.com/watch?v=BTnM71u_v2I"
+        );
+
+        return;
+    }
+
+
+    if (
+        lower.includes("play cherry cherry lady") ||
+        lower.includes("play cherry")
+    ) {
+
+        playDirect(
+            "Cherry Cherry Lady",
+            "https://m.youtube.com/watch?v=Z4sty2B2bCE"
+        );
+
+        return;
+    }
+
+
+    if (
+        lower.includes("play favourite") ||
+        lower.includes("play favorite")
+    ) {
+
+        playDirect(
+            "Favourite",
+            "https://m.youtube.com/watch?v=Fvt9hEAP6oQ"
+        );
+
+        return;
+    }
+
+
+    /* =====================================
        LOCATE / GOOGLE MAPS
     ===================================== */
 
@@ -318,50 +363,6 @@ function runCommand(text) {
             locatePlace(place);
 
         }
-
-        return;
-    }
-
-
-    /* =====================================
-       PLAY SONG
-    ===================================== */
-
-    if (
-        lower.includes("play golden brown")
-    ) {
-
-        playSong("Golden Brown");
-
-        return;
-    }
-
-
-    if (
-        lower.includes("play roi instrumental")
-    ) {
-
-        playSong("ROI instrumental");
-
-        return;
-    }
-
-
-    if (
-        lower.includes("play love nwantiti")
-    ) {
-
-        playSong("Love Nwantiti");
-
-        return;
-    }
-
-
-    if (
-        lower.includes("play suzume")
-    ) {
-
-        playSong("Suzume");
 
         return;
     }
@@ -392,7 +393,30 @@ function runCommand(text) {
 
 
 /* =========================================
-   GOOGLE MAPS LOCATE
+   PLAY DIRECT YOUTUBE LINK
+========================================= */
+
+function playDirect(song, url) {
+
+    $("status").textContent =
+        "PLAYING...";
+
+    $("reply").textContent =
+        "Playing: " + song;
+
+    speak(
+        "Playing " + song
+    );
+
+    window.open(
+        url,
+        "_blank"
+    );
+}
+
+
+/* =========================================
+   GOOGLE MAPS
 ========================================= */
 
 function locatePlace(place) {
@@ -430,38 +454,13 @@ function searchGoogle(question) {
     $("reply").textContent =
         "SEARCHING: " + question;
 
-    speak("Searching Google.");
+    speak(
+        "Searching Google."
+    );
 
     const url =
         "https://www.google.com/search?q=" +
         encodeURIComponent(question);
-
-    window.open(
-        url,
-        "_blank"
-    );
-}
-
-
-/* =========================================
-   YOUTUBE SONG SEARCH
-========================================= */
-
-function playSong(song) {
-
-    $("status").textContent =
-        "SEARCHING YOUTUBE...";
-
-    $("reply").textContent =
-        "PLAYING: " + song;
-
-    speak(
-        "Playing " + song
-    );
-
-    const url =
-        "https://www.youtube.com/results?search_query=" +
-        encodeURIComponent(song);
 
     window.open(
         url,
@@ -973,7 +972,7 @@ async function startHands() {
 
 
 /* =========================================
-   HAND → NEURAL CONTROL
+   HAND → NEURAL ROTATION
 ========================================= */
 
 function handleHands(results) {
