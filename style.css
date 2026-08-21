@@ -1,699 +1,822 @@
-*{
-  box-sizing:border-box;
-  margin:0;
-  padding:0;
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
 }
 
-html,body{
-  width:100%;
-  height:100%;
+body {
+    background: #020303;
+    color: white;
+    font-family: Arial, sans-serif;
+    overflow: hidden;
+    min-height: 100vh;
+    transition: 1s;
 }
 
-body{
-  background:#020509;
-  color:#168cff;
-  font-family:Arial,Helvetica,sans-serif;
-  overflow:hidden;
-  transition:background 1s,color 1s;
-}
+/* =========================
+   BACKGROUND
+========================= */
 
-body::before{
-  content:"";
-  position:fixed;
-  inset:0;
-  pointer-events:none;
-  z-index:100;
-  background:repeating-linear-gradient(
-    0deg,
-    transparent 0 4px,
-    rgba(255,255,255,.025) 5px
-  );
-}
+.grid {
+    position: fixed;
+    inset: 0;
 
+    background:
+        linear-gradient(
+            rgba(255,101,0,.04) 1px,
+            transparent 1px
+        ),
+        linear-gradient(
+            90deg,
+            rgba(255,101,0,.04) 1px,
+            transparent 1px
+        );
 
-/* HEADER */
+    background-size: 35px 35px;
 
-header{
-  height:70px;
-  padding:12px 18px;
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  border-bottom:1px solid currentColor;
-  position:relative;
-  z-index:5;
-}
-
-header small{
-  font-size:8px;
-  letter-spacing:4px;
-  opacity:.5;
-}
-
-h1{
-  margin:4px 0;
-  font-size:20px;
-  letter-spacing:3px;
-  text-shadow:0 0 10px currentColor;
-}
-
-h1 span{
-  font-size:8px;
-  border:1px solid currentColor;
-  padding:4px;
-}
-
-button{
-  color:inherit;
-  background:rgba(5,15,30,.75);
-  border:1px solid currentColor;
-  border-radius:8px;
-  padding:10px 13px;
-  font-weight:bold;
-  cursor:pointer;
-  box-shadow:0 0 10px rgba(0,120,255,.25);
-  transition:.3s;
-}
-
-button:active{
-  transform:scale(.9);
+    pointer-events: none;
 }
 
 
-/* MAIN CORE */
+/* =========================
+   HEADER
+========================= */
 
-.coreArea{
-  height:390px;
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  justify-content:center;
+header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+
+    height: 70px;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    padding: 10px 18px;
+
+    z-index: 20;
+
+    background: rgba(0,0,0,.45);
+    border-bottom: 1px solid rgba(255,101,0,.25);
 }
 
-.hud{
-  width:300px;
-  height:300px;
-  position:relative;
-  display:grid;
-  place-items:center;
+.logo {
+    font-size: 25px;
+    font-weight: bold;
+    letter-spacing: 5px;
+    color: #ff6500;
+    text-shadow: 0 0 15px #ff6500;
 }
 
-
-/* RINGS */
-
-.ring{
-  position:absolute;
-  border-radius:50%;
-  border:2px solid currentColor;
-  box-shadow:
-    0 0 12px currentColor,
-    inset 0 0 10px currentColor;
+.version {
+    font-size: 9px;
+    letter-spacing: 3px;
+    opacity: .6;
 }
 
-.outer{
-  width:300px;
-  height:300px;
-  animation:rotate 9s linear infinite;
+#status {
+    font-size: 11px;
+    letter-spacing: 2px;
+    color: #ff6500;
 }
 
-.middle{
-  width:230px;
-  height:230px;
-  border-style:dashed;
-  animation:reverseRotate 6s linear infinite;
-}
-
-.inner{
-  width:165px;
-  height:165px;
-  animation:rotate 3s linear infinite;
-}
-
-
-/* ARCS */
-
-.arc{
-  position:absolute;
-  border-radius:50%;
-  border:8px solid transparent;
-}
-
-.arc1{
-  width:275px;
-  height:275px;
-  border-top-color:currentColor;
-  border-right-color:currentColor;
-  animation:reverseRotate 4s linear infinite;
-}
-
-.arc2{
-  width:205px;
-  height:205px;
-  border-left-color:currentColor;
-  border-bottom-color:currentColor;
-  animation:rotate 5s linear infinite;
+header button,
+button {
+    background: rgba(255,101,0,.08);
+    border: 1px solid #ff6500;
+    color: #ff6500;
+    border-radius: 8px;
+    padding: 9px 13px;
+    cursor: pointer;
 }
 
 
-/* CORE */
+/* =========================
+   NEURAL CANVAS
+========================= */
 
-.core{
-  width:105px;
-  height:105px;
-  border-radius:50%;
-  display:grid;
-  place-items:center;
-  position:relative;
-  background:#020509;
-  border:2px solid currentColor;
-  box-shadow:
-    0 0 15px currentColor,
-    0 0 40px currentColor,
-    inset 0 0 25px currentColor;
-  z-index:5;
-}
-
-.core b{
-  color:white;
-  font-size:17px;
-  letter-spacing:2px;
-  text-shadow:0 0 10px currentColor;
-}
-
-.pulse{
-  position:absolute;
-  width:45px;
-  height:45px;
-  border-radius:50%;
-  background:currentColor;
-  opacity:.2;
-  animation:pulse 1.4s infinite;
+#neuralCanvas {
+    position: fixed;
+    inset: 0;
+    width: 100%;
+    height: 100%;
 }
 
 
-/* ANIMATIONS */
+/* =========================
+   CORE HUD
+========================= */
 
-@keyframes rotate{
-  to{
-    transform:rotate(360deg);
-  }
+.coreHUD {
+    position: fixed;
+
+    left: 50%;
+    top: 50%;
+
+    transform:
+        translate(-50%, -50%);
+
+    text-align: center;
+
+    pointer-events: none;
+
+    z-index: 4;
 }
 
-@keyframes reverseRotate{
-  to{
-    transform:rotate(-360deg);
-  }
+#coreText {
+    width: 100px;
+    height: 100px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 50%;
+
+    background: #ff6500;
+
+    color: #111;
+
+    font-size: 55px;
+    font-weight: bold;
+
+    box-shadow:
+        0 0 20px #ff6500,
+        0 0 60px #ff6500;
+
+    animation: corePulse 1.5s infinite;
 }
 
-@keyframes pulse{
-  50%{
-    transform:scale(1.7);
-    opacity:.5;
-  }
+#coreRing {
+    position: absolute;
+
+    width: 180px;
+    height: 180px;
+
+    left: 50%;
+    top: 50%;
+
+    transform: translate(-50%,-50%);
+
+    border:
+        2px solid #ff6500;
+
+    border-radius: 50%;
+
+    box-shadow:
+        0 0 20px #ff6500;
+
+    animation:
+        ringRotate 5s linear infinite;
 }
 
+#modeText {
+    margin-top: 30px;
 
-/* STATUS */
+    font-size: 11px;
+    letter-spacing: 4px;
 
-#status{
-  margin-top:12px;
-  font-size:10px;
-  letter-spacing:4px;
-  text-shadow:0 0 12px currentColor;
+    color: #ff6500;
 }
 
+@keyframes corePulse {
 
-/* CONTROLS */
+    0%,100% {
+        transform: scale(1);
+    }
 
-.controls{
-  display:flex;
-  justify-content:center;
-  flex-wrap:wrap;
-  gap:8px;
+    50% {
+        transform: scale(1.08);
+    }
+
 }
 
-.controls button{
-  width:90px;
-  height:65px;
-  display:flex;
-  flex-direction:column;
-  justify-content:center;
-  align-items:center;
-  gap:5px;
-}
+@keyframes ringRotate {
 
-.controls small{
-  font-size:8px;
-}
+    from {
+        transform:
+            translate(-50%,-50%)
+            rotate(0deg);
+    }
 
+    to {
+        transform:
+            translate(-50%,-50%)
+            rotate(360deg);
+    }
 
-/* COMMAND */
-
-.command{
-  max-width:650px;
-  margin:18px auto;
-  padding:0 15px;
-  display:flex;
-  gap:5px;
-}
-
-.command input{
-  flex:1;
-  min-width:0;
-  background:#020509;
-  color:white;
-  border:1px solid currentColor;
-  border-radius:8px;
-  padding:13px;
-  outline:none;
-}
-
-.command input:disabled{
-  opacity:.35;
-}
-
-
-/* REPLY */
-
-#reply{
-  text-align:center;
-  font-size:12px;
-  opacity:.7;
-}
-
-
-/* =========================================
-   NEURAL SYSTEM
-========================================= */
-
-#neuralScreen{
-  display:none;
-  position:fixed;
-  inset:0;
-  background:
-    radial-gradient(
-      circle at center,
-      #152338 0%,
-      #050b14 45%,
-      #020509 100%
-    );
-  z-index:20;
-  overflow:hidden;
-}
-
-.neuralHeader{
-  position:absolute;
-  top:15px;
-  left:15px;
-  right:15px;
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  z-index:25;
-}
-
-.neuralHeader small{
-  letter-spacing:3px;
-  opacity:.5;
-}
-
-.neuralHeader h2{
-  margin:4px 0;
-  letter-spacing:3px;
-  text-shadow:0 0 15px currentColor;
-}
-
-#neuralCanvas{
-  position:absolute;
-  inset:0;
-  width:100%;
-  height:100%;
-  display:block;
 }
 
 
-/* NEURAL INFO */
+/* =========================
+   COMMAND PANEL
+========================= */
 
-.neuralInfo{
-  position:absolute;
-  bottom:20px;
-  left:20px;
-  letter-spacing:2px;
-  font-size:11px;
-  text-shadow:0 0 10px currentColor;
-  z-index:25;
+.commandPanel {
+    position: fixed;
+
+    bottom: 95px;
+    left: 50%;
+
+    transform: translateX(-50%);
+
+    width: min(700px, 90%);
+
+    z-index: 20;
+}
+
+#reply {
+    text-align: center;
+
+    min-height: 25px;
+
+    font-size: 12px;
+    letter-spacing: 1px;
+
+    margin-bottom: 8px;
+
+    color: #ffb07a;
+}
+
+.commandRow {
+    display: flex;
+    gap: 7px;
+}
+
+#command {
+    flex: 1;
+
+    background: rgba(0,0,0,.75);
+
+    border:
+        1px solid #ff6500;
+
+    color: white;
+
+    padding: 13px;
+
+    border-radius: 8px;
+
+    outline: none;
+}
+
+#command::placeholder {
+    color: #777;
 }
 
 
-/* =========================================
-   SMALL FLOATING CAMERA
-========================================= */
+/* =========================
+   CONTROLS
+========================= */
 
-#cameraBox{
-  display:none;
+.controls {
+    position: fixed;
 
-  position:fixed;
+    bottom: 20px;
 
-  width:155px;
-  height:120px;
+    left: 50%;
+    transform: translateX(-50%);
 
-  right:15px;
-  bottom:65px;
+    display: flex;
+    gap: 8px;
 
-  background:#020509;
+    z-index: 20;
+}
 
-  border:1px solid #ff6500;
+.controls button {
+    width: 62px;
+    height: 55px;
 
-  border-radius:12px;
+    display: flex;
+    flex-direction: column;
 
-  overflow:hidden;
+    align-items: center;
+    justify-content: center;
 
-  z-index:40;
+    font-size: 17px;
+}
 
-  box-shadow:
-    0 0 15px #ff6500,
-    0 0 30px rgba(255,101,0,.25),
-    inset 0 0 15px rgba(255,101,0,.2);
+.controls small {
+    font-size: 7px;
+    margin-top: 3px;
 }
 
 
-/* CAMERA */
+/* =========================
+   HISTORY
+========================= */
 
-#video{
-  position:absolute;
-  inset:0;
+#historyPanel {
+    position: fixed;
 
-  width:100%;
-  height:100%;
+    top: 85px;
+    left: 15px;
 
-  object-fit:cover;
+    width: 220px;
+    max-height: 230px;
 
-  transform:scaleX(-1);
+    overflow: auto;
 
-  opacity:.55;
+    background: rgba(0,0,0,.65);
+
+    border:
+        1px solid rgba(255,101,0,.3);
+
+    border-radius: 10px;
+
+    padding: 12px;
+
+    z-index: 15;
+}
+
+.panelTitle {
+    font-size: 9px;
+    letter-spacing: 2px;
+    color: #ff6500;
+    margin-bottom: 8px;
+}
+
+.historyItem {
+    font-size: 10px;
+    padding: 7px 0;
+    border-bottom: 1px solid #222;
+}
+
+.historyItem b {
+    color: #ff6500;
 }
 
 
-/* HAND LANDMARK CANVAS */
+/* =========================
+   SPEAKING WAVE
+========================= */
 
-#handCanvas{
-  position:absolute;
-  inset:0;
+#voiceWave {
+    position: fixed;
 
-  width:100%;
-  height:100%;
+    bottom: 170px;
 
-  pointer-events:none;
+    left: 50%;
 
-  z-index:2;
+    transform: translateX(-50%);
+
+    width: min(850px, 92%);
+
+    display: none;
+
+    text-align: center;
+
+    z-index: 50;
+}
+
+#waveBars {
+    height: 100px;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    gap: 3px;
+
+    overflow: hidden;
+}
+
+#waveBars span {
+    width: 3px;
+
+    height: 15px;
+
+    background: #ff6500;
+
+    border-radius: 4px;
+
+    box-shadow:
+        0 0 8px #ff6500;
+
+    animation:
+        voiceBars .45s infinite alternate;
+}
+
+@keyframes voiceBars {
+
+    0% {
+        height: 10px;
+    }
+
+    50% {
+        height: 45px;
+    }
+
+    100% {
+        height: 85px;
+    }
+
+}
+
+#voiceTime {
+    color: white;
+
+    font-size: 12px;
+
+    letter-spacing: 4px;
 }
 
 
-/* CAMERA LABEL */
+/* =========================
+   NEURAL SCREEN
+========================= */
 
-#cameraBox > div{
-  position:absolute;
+#neuralScreen {
+    display: none;
 
-  left:0;
-  bottom:0;
+    position: fixed;
 
-  width:100%;
+    inset: 0;
 
-  padding:5px;
+    z-index: 10;
 
-  background:rgba(0,0,0,.7);
+    pointer-events: none;
+}
 
-  color:#ff6500;
+#exitNeural {
+    position: absolute;
 
-  text-align:center;
+    top: 85px;
+    right: 20px;
 
-  font-size:8px;
+    pointer-events: auto;
+}
 
-  letter-spacing:1px;
+.neuralTitle {
+    position: absolute;
 
-  text-shadow:0 0 8px #ff6500;
+    top: 90px;
+    left: 50%;
 
-  z-index:4;
+    transform: translateX(-50%);
+
+    color: #ff6500;
+
+    letter-spacing: 5px;
+}
+
+.neuralInfo {
+    position: absolute;
+
+    bottom: 160px;
+    right: 20px;
+
+    font-size: 9px;
+    line-height: 2;
+
+    text-align: right;
+
+    color: #ff9a65;
 }
 
 
-/* CAMERA CLOSE */
+/* =========================
+   CAMERA
+========================= */
 
-#closeHand{
-  position:absolute;
+#cameraBox {
+    display: none;
 
-  top:5px;
-  right:5px;
+    position: fixed;
 
-  padding:3px 6px;
+    right: 15px;
+    bottom: 15px;
 
-  font-size:10px;
+    width: 180px;
+    height: 135px;
 
-  background:rgba(0,0,0,.75);
+    background: #050505;
 
-  z-index:5;
+    border:
+        1px solid #ff6500;
+
+    border-radius: 10px;
+
+    overflow: hidden;
+
+    z-index: 60;
+}
+
+#video {
+    width: 100%;
+    height: 100%;
+
+    object-fit: cover;
+
+    transform: scaleX(-1);
+}
+
+#handCanvas {
+    position: absolute;
+
+    inset: 0;
+
+    width: 100%;
+    height: 100%;
+}
+
+#handStatus,
+#gesture {
+    position: absolute;
+
+    left: 6px;
+
+    font-size: 7px;
+
+    color: #ff6500;
+}
+
+#handStatus {
+    top: 5px;
+}
+
+#gesture {
+    bottom: 5px;
+}
+
+#closeHand {
+    position: absolute;
+
+    right: 5px;
+    top: 5px;
+
+    padding: 3px 6px;
+
+    font-size: 10px;
 }
 
 
-/* CAMERA ACTIVE EFFECT */
+/* =========================
+   DIAGNOSTICS
+========================= */
 
-#cameraBox::before{
-  content:"";
+#diagnosticPanel {
+    display: none;
 
-  position:absolute;
+    position: fixed;
 
-  inset:5px;
+    left: 50%;
+    top: 50%;
 
-  border:1px solid rgba(255,101,0,.35);
+    transform: translate(-50%,-50%);
 
-  border-radius:8px;
+    width: min(430px,90%);
 
-  pointer-events:none;
+    background:
+        rgba(5,5,5,.95);
 
-  z-index:3;
+    border:
+        1px solid #ff6500;
+
+    border-radius: 15px;
+
+    padding: 25px;
+
+    z-index: 80;
+
+    box-shadow:
+        0 0 50px rgba(255,101,0,.3);
+}
+
+#diagnosticPanel h2 {
+    text-align: center;
+
+    color: #ff6500;
+
+    letter-spacing: 4px;
+
+    margin-bottom: 20px;
+}
+
+#closeDiagnostic {
+    position: absolute;
+
+    top: 10px;
+    right: 10px;
+}
+
+.diagnosticGrid {
+    display: grid;
+
+    grid-template-columns:
+        1fr 1fr;
+
+    gap: 10px;
+}
+
+.diagnosticGrid div {
+    border:
+        1px solid #333;
+
+    padding: 12px;
+
+    border-radius: 8px;
+}
+
+.diagnosticGrid span {
+    display: block;
+
+    font-size: 8px;
+
+    color: #777;
+}
+
+.diagnosticGrid b {
+    font-size: 11px;
+
+    color: #ff6500;
 }
 
 
-/* =========================================
+/* =========================
    LOGIN
-========================================= */
+========================= */
 
-#loginPanel{
-  display:none;
+#loginPanel {
+    display: none;
 
-  position:fixed;
+    position: fixed;
 
-  inset:0;
+    inset: 0;
 
-  z-index:50;
+    background:
+        rgba(0,0,0,.85);
 
-  place-items:center;
+    place-items: center;
 
-  background:rgba(0,0,0,.8);
-
-  backdrop-filter:blur(10px);
+    z-index: 100;
 }
 
-.loginBox{
-  width:min(350px,90%);
+.loginBox {
+    position: relative;
 
-  padding:30px;
+    width: min(350px,90%);
 
-  text-align:center;
+    padding: 30px;
 
-  background:#020509;
+    background: #080808;
 
-  border:1px solid currentColor;
+    border:
+        1px solid #ff6500;
 
-  box-shadow:0 0 35px currentColor;
+    border-radius: 15px;
 
-  position:relative;
+    text-align: center;
 }
 
-#closeLogin{
-  position:absolute;
-  right:10px;
-  top:10px;
-  padding:5px 8px;
+.loginBox h2 {
+    color: #ff6500;
+
+    letter-spacing: 4px;
+
+    margin-bottom: 20px;
 }
 
-.loginLogo{
-  width:65px;
-  height:65px;
+.loginBox input {
+    width: 100%;
 
-  margin:10px auto;
+    padding: 12px;
 
-  display:grid;
-  place-items:center;
+    margin: 5px 0;
 
-  border-radius:50%;
+    background: #111;
 
-  border:2px solid currentColor;
+    color: white;
 
-  box-shadow:0 0 25px currentColor;
+    border: 1px solid #333;
 
-  font-size:30px;
+    border-radius: 7px;
+
+    outline: none;
 }
 
-.loginBox h2{
-  letter-spacing:3px;
+#loginSubmit {
+    width: 100%;
+
+    margin-top: 10px;
 }
 
-.loginBox input{
-  width:100%;
+#loginStatus {
+    margin-top: 15px;
 
-  margin:6px 0;
+    font-size: 9px;
 
-  padding:12px;
-
-  background:#000;
-
-  color:white;
-
-  border:1px solid currentColor;
-
-  outline:none;
+    color: #ff6500;
 }
 
-#loginSubmit{
-  width:100%;
-  margin-top:10px;
+#closeLogin {
+    position: absolute;
+
+    right: 10px;
+    top: 10px;
 }
 
 
-/* =========================================
-   BLUE → ORANGE TRANSITION
-========================================= */
+/* =========================
+   LOCKED STATE
+========================= */
 
-#transition{
-  position:fixed;
-
-  width:20px;
-  height:20px;
-
-  border-radius:50%;
-
-  left:50%;
-  top:50%;
-
-  transform:
-    translate(-50%,-50%)
-    scale(0);
-
-  background:#ff6500;
-
-  z-index:80;
-
-  pointer-events:none;
+body.locked #neuralCanvas {
+    filter: hue-rotate(100deg);
 }
 
-body.unlocking #transition{
-  animation:
-    circularTransition
-    1.5s
-    ease-in-out;
+body.locked #coreText {
+    background: #087cff;
+
+    box-shadow:
+        0 0 20px #087cff,
+        0 0 60px #087cff;
 }
 
-@keyframes circularTransition{
+body.locked #coreRing {
+    border-color: #087cff;
+    box-shadow: 0 0 20px #087cff;
+}
 
-  0%{
-    transform:
-      translate(-50%,-50%)
-      scale(0);
-  }
-
-  45%{
-    transform:
-      translate(-50%,-50%)
-      scale(25);
-  }
-
-  70%{
-    transform:
-      translate(-50%,-50%)
-      scale(25);
-  }
-
-  100%{
-    transform:
-      translate(-50%,-50%)
-      scale(0);
-  }
+body.locked #modeText,
+body.locked #status {
+    color: #087cff;
 }
 
 
-/* =========================================
-   ONLINE ORANGE MODE
-========================================= */
+/* =========================
+   UNLOCK ANIMATION
+========================= */
 
-body.online{
-  color:#ff6500;
-  background:#090300;
+body.unlocking::after {
+    content: "";
+
+    position: fixed;
+
+    width: 20px;
+    height: 20px;
+
+    left: 50%;
+    top: 50%;
+
+    border:
+        5px solid #ff6500;
+
+    border-radius: 50%;
+
+    transform: translate(-50%,-50%);
+
+    animation:
+        unlockCircle 1.3s ease-out forwards;
+
+    z-index: 200;
 }
 
-body.online .core{
-  background:#160700;
+@keyframes unlockCircle {
 
-  box-shadow:
-    0 0 15px #ff6500,
-    0 0 45px #ff6500,
-    inset 0 0 25px #ff6500;
+    from {
+        width: 20px;
+        height: 20px;
+        opacity: 1;
+    }
+
+    to {
+        width: 250vmax;
+        height: 250vmax;
+        opacity: 0;
+    }
+
 }
 
-body.online button{
-  box-shadow:
-    0 0 12px
-    rgba(255,90,0,.35);
-}
 
-
-/* =========================================
+/* =========================
    MOBILE
-========================================= */
+========================= */
 
-@media(max-width:500px){
+@media(max-width:600px) {
 
-  .hud{
-    width:260px;
-    height:260px;
-  }
+    #historyPanel {
+        width: 150px;
+        max-height: 150px;
 
-  .outer{
-    width:260px;
-    height:260px;
-  }
+        font-size: 8px;
+    }
 
-  .middle{
-    width:200px;
-    height:200px;
-  }
+    #status {
+        display: none;
+    }
 
-  .inner{
-    width:145px;
-    height:145px;
-  }
+    .controls button {
+        width: 55px;
+        height: 50px;
+    }
 
-  .arc1{
-    width:235px;
-    height:235px;
-  }
-
-  .arc2{
-    width:180px;
-    height:180px;
-  }
-
-  #cameraBox{
-    width:135px;
-    height:100px;
-
-    right:10px;
-    bottom:60px;
-  }
-
-  .neuralInfo{
-    bottom:12px;
-    left:12px;
-  }
+    #cameraBox {
+        width: 145px;
+        height: 110px;
+    }
 
 }
