@@ -1,50 +1,227 @@
-/* =========================================
-   FRIDAY MARK 5
-========================================= */
+/* =====================================================
+   FRIDAY MARK 6
+   ===================================================== */
 
 const $ = id => document.getElementById(id);
 
 let online = false;
+let neuralPaused = false;
 let neuralOpen = false;
 let handRunning = false;
-let neuralPaused = false;
 
-let scene, camera, renderer;
+let scene;
+let camera;
+let renderer;
 let neuralGroup;
+
 let nodes = [];
+let lines = [];
+
 let neuralStarted = false;
 
-let lastHandX = null;
-let lastHandY = null;
+let lastPalmX = null;
+let lastPalmY = null;
+
 let pinch = false;
+let lastSwipe = 0;
+
+let recognition = null;
+let listening = false;
 
 
-/* =========================================
-   LOCK / UNLOCK
-========================================= */
+/* =====================================================
+   INITIALIZE WAVEFORM
+===================================================== */
 
-if ($("unlockBtn")) {
+const waveBars = $("waveBars");
 
-    $("unlockBtn").onclick = () => {
+for (let i = 0; i < 95; i++) {
 
-        if (online) {
-            lockFriday();
-        } else {
-            unlockFriday();
-        }
+    const bar =
+        document.createElement("span");
 
+    bar.style.animationDelay =
+        `${Math.random() * .5}s`;
+
+    waveBars.appendChild(bar);
+}
+
+
+/* =====================================================
+   STATUS
+===================================================== */
+
+function setStatus(text) {
+
+    $("status").textContent = text;
+}
+
+
+/* =====================================================
+   HISTORY
+===================================================== */
+
+function addHistory(user, reply) {
+
+    const item =
+        document.createElement("div");
+
+    item.className =
+        "historyItem";
+
+    item.innerHTML =
+        `<b>YOU:</b> ${escapeHTML(user)}
+         <br>
+         <span>FRIDAY: ${escapeHTML(reply)}</span>`;
+
+    $("history").prepend(item);
+
+    while (
+        $("history").children.length > 8
+    ) {
+
+        $("history").lastChild.remove();
+
+    }
+}
+
+
+function escapeHTML(text) {
+
+    return text
+        .replaceAll("&","&amp;")
+        .replaceAll("<","&lt;")
+        .replaceAll(">","&gt;");
+}
+
+
+/* =====================================================
+   SPEECH
+===================================================== */
+
+function speak(text) {
+
+    if (!("speechSynthesis" in window))
+        return;
+
+    speechSynthesis.cancel();
+
+    $("voiceWave").style.display =
+        "block";
+
+    setStatus(
+        "FRIDAY — SPEAKING"
+    );
+
+    $("voiceState").textContent =
+        "SPEAKING";
+
+    $("modeText").textContent =
+        "SPEAKING";
+
+    setNeuralMode(
+        "speaking"
+    );
+
+    const utterance =
+        new SpeechSynthesisUtterance(text);
+
+    utterance.rate = .88;
+    utterance.pitch = .82;
+    utterance.volume = 1;
+
+    const voices =
+        speechSynthesis.getVoices();
+
+    const female =
+        voices.find(v =>
+            /female|zira|samantha|google us english/i
+                .test(v.name)
+        );
+
+    if (female)
+        utterance.voice = female;
+
+    utterance.onend = () => {
+
+        $("voiceWave").style.display =
+            "none";
+
+        $("voiceState").textContent =
+            "READY";
+
+        setStatus(
+            "FRIDAY — ONLINE"
+        );
+
+        $("modeText").textContent =
+            "ONLINE";
+
+        setNeuralMode(
+            "idle"
+        );
     };
+
+    speechSynthesis.speak(
+        utterance
+    );
+}
+
+
+/* =====================================================
+   RESPONSE
+===================================================== */
+
+function respond(text, userCommand = "") {
+
+    $("reply").textContent =
+        "FRIDAY: " + text;
+
+    if (userCommand)
+        addHistory(
+            userCommand,
+            text
+        );
+
+    speak(text);
+}
+
+
+/* =====================================================
+   LOCK / UNLOCK
+===================================================== */
+
+$("unlockBtn").onclick =
+    toggleLock;
+
+
+function toggleLock() {
+
+    if (online) {
+
+        lockFriday();
+
+    } else {
+
+        unlockFriday();
+
+    }
 }
 
 
 function unlockFriday() {
 
-    document.body.classList.add("unlocking");
+    document.body.classList.add(
+        "unlocking"
+    );
 
-    $("status").textContent =
-        "ACTIVATING FRIDAY...";
+    setStatus(
+        "ACTIVATING FRIDAY..."
+    );
 
-    speak("Activating.");
+    setNeuralMode(
+        "thinking"
+    );
 
     setTimeout(() => {
 
@@ -53,191 +230,258 @@ function unlockFriday() {
             "unlocking"
         );
 
-        document.body.classList.add("online");
+        document.body.classList.add(
+            "online"
+        );
 
         online = true;
 
-        $("status").textContent =
-            "FRIDAY — ONLINE";
+        $("command").disabled =
+            false;
+
+        $("command").placeholder =
+            "Ask FRIDAY...";
 
         $("unlockBtn").innerHTML =
             "🔒<small>LOCK</small>";
 
-        if ($("command")) {
+        $("coreState").textContent =
+            "ONLINE";
 
-            $("command").disabled = false;
+        $("systemMode").textContent =
+            "ACTIVE";
 
-            $("command").placeholder =
-                "Ask FRIDAY...";
-        }
+        $("modeText").textContent =
+            "ONLINE";
 
-        if ($("reply")) {
+        setStatus(
+            "FRIDAY — ONLINE"
+        );
 
-            $("reply").textContent =
-                "ALL SYSTEMS ONLINE";
-        }
+        startNeural();
 
-    }, 1400);
+        speak(
+            "FRIDAY online. All systems operational."
+        );
+
+    }, 1200);
 }
 
 
 function lockFriday() {
 
-    handRunning = false;
-
-    if ($("cameraBox"))
-        $("cameraBox").style.display = "none";
-
-    neuralOpen = false;
-
-    if ($("neuralScreen"))
-        $("neuralScreen").style.display = "none";
-
     online = false;
 
-    document.body.classList.remove("online");
+    handRunning = false;
 
-    document.body.classList.add("locked");
+    $("cameraBox").style.display =
+        "none";
 
-    $("status").textContent =
-        "FRIDAY — SLEEP MODE";
+    $("neuralScreen").style.display =
+        "none";
+
+    $("command").disabled =
+        true;
+
+    $("command").value = "";
+
+    $("command").placeholder =
+        "FRIDAY is sleeping...";
+
+    document.body.classList.remove(
+        "online"
+    );
+
+    document.body.classList.add(
+        "locked"
+    );
 
     $("unlockBtn").innerHTML =
         "🔓<small>UNLOCK</small>";
 
-    if ($("command")) {
+    $("systemMode").textContent =
+        "SLEEP";
 
-        $("command").disabled = true;
+    $("modeText").textContent =
+        "SLEEP MODE";
 
-        $("command").value = "";
+    setStatus(
+        "FRIDAY — SLEEP MODE"
+    );
 
-        $("command").placeholder =
-            "FRIDAY is sleeping...";
-    }
+    neuralPaused = true;
 
-    if ($("reply"))
-        $("reply").textContent =
-            "SYSTEM STANDBY";
-
-    speak("Entering sleep mode.");
+    speak(
+        "Entering sleep mode."
+    );
 }
 
 
-/* =========================================
-   VOICE
-========================================= */
+/* =====================================================
+   VOICE BUTTON
+===================================================== */
 
-if ($("voiceBtn"))
-    $("voiceBtn").onclick = voice;
+$("voiceBtn").onclick =
+    startListening;
 
 
-function voice() {
+function startListening() {
 
     if (!online) {
 
         speak(
-            "FRIDAY is in sleep mode."
+            "FRIDAY is sleeping."
         );
 
         return;
     }
 
-    const SpeechRecognition =
+    const SR =
         window.SpeechRecognition ||
         window.webkitSpeechRecognition;
 
-    if (!SpeechRecognition) {
+    if (!SR) {
 
         speak(
-            "Voice recognition is not supported."
+            "Voice recognition is not supported by this browser."
         );
 
         return;
     }
 
-    $("status").textContent =
-        "LISTENING...";
+    if (listening) {
 
-    const recognition =
-        new SpeechRecognition();
+        recognition.stop();
 
-    recognition.lang = "en-US";
-    recognition.continuous = false;
-    recognition.interimResults = false;
+        return;
+    }
+
+    recognition =
+        new SR();
+
+    recognition.lang =
+        "en-US";
+
+    recognition.continuous =
+        false;
+
+    recognition.interimResults =
+        false;
+
+    recognition.onstart = () => {
+
+        listening = true;
+
+        setStatus(
+            "FRIDAY — LISTENING"
+        );
+
+        $("voiceState").textContent =
+            "LISTENING";
+
+        $("modeText").textContent =
+            "LISTENING";
+
+        setNeuralMode(
+            "listening"
+        );
+    };
+
+
+    recognition.onresult =
+        event => {
+
+            const text =
+                event
+                    .results[0][0]
+                    .transcript;
+
+            $("command").value =
+                text;
+
+            runCommand(text);
+        };
+
+
+    recognition.onerror =
+        () => {
+
+            listening = false;
+
+            setStatus(
+                "FRIDAY — ONLINE"
+            );
+        };
+
+
+    recognition.onend =
+        () => {
+
+            listening = false;
+
+            $("voiceState").textContent =
+                "READY";
+
+            if (online) {
+
+                setStatus(
+                    "FRIDAY — ONLINE"
+                );
+            }
+        };
+
 
     recognition.start();
-
-    recognition.onresult = event => {
-
-        const text =
-            event.results[0][0].transcript;
-
-        $("command").value = text;
-
-        runCommand(text);
-    };
-
-    recognition.onerror = () => {
-
-        $("status").textContent =
-            "FRIDAY — ONLINE";
-    };
 }
 
 
-/* =========================================
-   TEXT COMMAND
-========================================= */
+/* =====================================================
+   COMMAND BUTTON
+===================================================== */
 
-if ($("sendBtn")) {
-
-    $("sendBtn").onclick = () => {
+$("sendBtn").onclick =
+    () => {
 
         runCommand(
             $("command").value
         );
 
     };
-}
 
 
-if ($("command")) {
+$("command").addEventListener(
+    "keydown",
+    e => {
 
-    $("command").addEventListener(
-        "keydown",
-        e => {
+        if (e.key === "Enter")
+            runCommand(
+                $("command").value
+            );
 
-            if (e.key === "Enter") {
-
-                runCommand(
-                    $("command").value
-                );
-
-            }
-
-        }
-    );
-}
+    }
+);
 
 
-/* =========================================
-   COMMAND SYSTEM
-========================================= */
+/* =====================================================
+   COMMAND ENGINE
+===================================================== */
 
 function runCommand(text) {
+
+    text =
+        text.trim();
+
+    if (!text)
+        return;
 
     if (!online) {
 
         speak(
-            "Please activate FRIDAY first."
+            "Please unlock FRIDAY first."
         );
 
         return;
     }
-
-    text = text.trim();
-
-    if (!text) return;
 
     const lower =
         text.toLowerCase();
@@ -251,35 +495,63 @@ function runCommand(text) {
     ) {
 
         respond(
-            "Hello Boss. All systems are operational."
+            "Hello Boss. I am ready.",
+            text
         );
 
         return;
     }
 
 
-    /* NEURAL SYSTEM */
+    /* SYSTEM STATUS */
 
     if (
-        lower.includes("neural system") ||
-        lower.includes("show neural") ||
-        lower.includes("open neural")
+        lower.includes("system status") ||
+        lower.includes("system diagnostics") ||
+        lower.includes("diagnostics")
     ) {
 
-        showNeural();
+        showDiagnostics();
+
+        respond(
+            "All major systems are operational.",
+            text
+        );
 
         return;
     }
 
 
-    /* EXIT NEURAL */
+    /* NEURAL */
 
     if (
-        lower.includes("exit neural") ||
-        lower.includes("close neural")
+        lower.includes("open neural") ||
+        lower.includes("show neural") ||
+        lower.includes("neural system")
+    ) {
+
+        showNeural();
+
+        respond(
+            "Neural control activated.",
+            text
+        );
+
+        return;
+    }
+
+
+    if (
+        lower.includes("close neural") ||
+        lower.includes("exit neural")
     ) {
 
         hideNeural();
+
+        respond(
+            "Neural control closed.",
+            text
+        );
 
         return;
     }
@@ -292,24 +564,30 @@ function runCommand(text) {
         lower.includes("sleep mode")
     ) {
 
+        addHistory(
+            text,
+            "Entering sleep mode."
+        );
+
         lockFriday();
 
         return;
     }
 
 
-    /* =====================================
-       FIXED SONGS
-    ===================================== */
+    /* =================================================
+       FIXED MUSIC
+    ================================================= */
 
     if (
         lower.includes("play golden") ||
         lower.includes("play golden brown")
     ) {
 
-        playDirect(
+        playSong(
             "Golden Brown",
-            "https://m.youtube.com/watch?v=BTnM71u_v2I"
+            "https://m.youtube.com/watch?v=BTnM71u_v2I",
+            text
         );
 
         return;
@@ -317,13 +595,14 @@ function runCommand(text) {
 
 
     if (
-        lower.includes("play cherry cherry lady") ||
-        lower.includes("play cherry")
+        lower.includes("play cherry") ||
+        lower.includes("cherry cherry lady")
     ) {
 
-        playDirect(
+        playSong(
             "Cherry Cherry Lady",
-            "https://m.youtube.com/watch?v=Z4sty2B2bCE"
+            "https://m.youtube.com/watch?v=Z4sty2B2bCE",
+            text
         );
 
         return;
@@ -335,77 +614,95 @@ function runCommand(text) {
         lower.includes("play favorite")
     ) {
 
-        playDirect(
+        playSong(
             "Favourite",
-            "https://m.youtube.com/watch?v=Fvt9hEAP6oQ"
+            "https://m.youtube.com/watch?v=Fvt9hEAP6oQ",
+            text
         );
 
         return;
     }
 
 
-    /* =====================================
-       LOCATE / GOOGLE MAPS
-    ===================================== */
+    /* =================================================
+       LOCATE
+    ================================================= */
 
     if (
         lower.startsWith("locate ") ||
         lower.startsWith("find ")
     ) {
 
-        let place = text
-            .replace(/^locate\s+/i, "")
-            .replace(/^find\s+/i, "")
-            .trim();
+        let place =
+            text
+                .replace(/^locate\s+/i,"")
+                .replace(/^find\s+/i,"")
+                .trim();
 
-        if (place) {
-
-            locatePlace(place);
-
-        }
+        locate(place,text);
 
         return;
     }
 
 
-    /* =====================================
-       OPEN WEBSITE / APP
-    ===================================== */
+    /* =================================================
+       OPEN YOUTUBE
+    ================================================= */
 
     if (
-        lower.startsWith("open ")
+        lower.includes("open youtube")
     ) {
 
-        openSite(
-            text.substring(5).trim()
+        addHistory(
+            text,
+            "Opening YouTube."
+        );
+
+        speak(
+            "Opening YouTube."
+        );
+
+        window.open(
+            "https://m.youtube.com",
+            "_blank"
         );
 
         return;
     }
 
 
-    /* =====================================
-       NORMAL GOOGLE SEARCH
-    ===================================== */
+    /* GOOGLE */
 
-    searchGoogle(text);
+    searchGoogle(
+        text
+    );
 }
 
 
-/* =========================================
-   PLAY DIRECT YOUTUBE LINK
-========================================= */
+/* =====================================================
+   MUSIC
+===================================================== */
 
-function playDirect(song, url) {
+function playSong(
+    name,
+    url,
+    command
+) {
 
-    $("status").textContent =
-        "PLAYING...";
+    setStatus(
+        "PLAYING — " + name
+    );
 
     $("reply").textContent =
-        "Playing: " + song;
+        "Playing: " + name;
+
+    addHistory(
+        command,
+        "Playing " + name
+    );
 
     speak(
-        "Playing " + song
+        "Playing " + name
     );
 
     window.open(
@@ -415,44 +712,29 @@ function playDirect(song, url) {
 }
 
 
-/* =========================================
-   GOOGLE MAPS
-========================================= */
-
-function locatePlace(place) {
-
-    $("status").textContent =
-        "LOCATING...";
-
-    $("reply").textContent =
-        "LOCATING: " + place;
-
-    speak(
-        "Locating " + place
-    );
-
-    const url =
-        "https://www.google.com/maps/search/?api=1&query=" +
-        encodeURIComponent(place);
-
-    window.open(
-        url,
-        "_blank"
-    );
-}
-
-
-/* =========================================
+/* =====================================================
    GOOGLE SEARCH
-========================================= */
+===================================================== */
 
-function searchGoogle(question) {
+function searchGoogle(
+    question
+) {
 
-    $("status").textContent =
-        "SEARCHING GOOGLE...";
+    setStatus(
+        "SEARCHING GOOGLE..."
+    );
 
     $("reply").textContent =
-        "SEARCHING: " + question;
+        "Searching: " + question;
+
+    addHistory(
+        question,
+        "Searching Google."
+    );
+
+    setNeuralMode(
+        "thinking"
+    );
 
     speak(
         "Searching Google."
@@ -460,141 +742,67 @@ function searchGoogle(question) {
 
     const url =
         "https://www.google.com/search?q=" +
-        encodeURIComponent(question);
-
-    window.open(
-        url,
-        "_blank"
-    );
-}
-
-
-/* =========================================
-   OPEN WEBSITE
-========================================= */
-
-function openSite(name) {
-
-    let url = name;
-
-    if (!url.startsWith("http")) {
-
-        if (!url.includes(".")) {
-
-            url =
-                "https://www.google.com/search?q=" +
-                encodeURIComponent(name);
-
-        } else {
-
-            url =
-                "https://" + name;
-        }
-    }
-
-    speak(
-        "Opening " + name
-    );
-
-    window.open(
-        url,
-        "_blank"
-    );
-}
-
-
-/* =========================================
-   FRIDAY VOICE
-========================================= */
-
-function speak(text) {
-
-    if (!("speechSynthesis" in window))
-        return;
-
-    speechSynthesis.cancel();
-
-    const u =
-        new SpeechSynthesisUtterance(text);
-
-    u.rate = 0.88;
-    u.pitch = 0.82;
-    u.volume = 1;
-
-    speechSynthesis.speak(u);
-}
-
-
-function respond(text) {
-
-    if ($("reply"))
-        $("reply").textContent =
-            "FRIDAY: " + text;
-
-    speak(text);
-}
-
-
-/* =========================================
-   NEURAL SYSTEM
-========================================= */
-
-if ($("neuralBtn"))
-    $("neuralBtn").onclick =
-        showNeural;
-
-
-if ($("exitNeural"))
-    $("exitNeural").onclick =
-        hideNeural;
-
-
-function showNeural() {
-
-    if (!online) {
-
-        speak(
-            "Neural system unavailable while sleeping."
+        encodeURIComponent(
+            question
         );
 
-        return;
-    }
-
-    neuralOpen = true;
-
-    $("neuralScreen").style.display =
-        "block";
-
-    startNeural();
-
-    startHands();
+    window.open(
+        url,
+        "_blank"
+    );
 }
 
 
-function hideNeural() {
+/* =====================================================
+   GOOGLE MAPS
+===================================================== */
 
-    neuralOpen = false;
+function locate(
+    place,
+    command
+) {
 
-    handRunning = false;
+    setStatus(
+        "LOCATION MODE"
+    );
 
-    $("neuralScreen").style.display =
-        "none";
+    $("reply").textContent =
+        "Locating: " + place;
 
-    $("cameraBox").style.display =
-        "none";
+    addHistory(
+        command,
+        "Opening Maps for " + place
+    );
 
-    lastHandX = null;
-    lastHandY = null;
+    setNeuralMode(
+        "thinking"
+    );
+
+    speak(
+        "Locating " + place
+    );
+
+    const url =
+        "https://www.google.com/maps/search/?api=1&query=" +
+        encodeURIComponent(
+            place
+        );
+
+    window.open(
+        url,
+        "_blank"
+    );
 }
 
 
-/* =========================================
-   THREE.JS NEURAL SYSTEM
-========================================= */
+/* =====================================================
+   NEURAL THREE.JS
+===================================================== */
 
 function startNeural() {
 
-    if (neuralStarted) return;
+    if (neuralStarted)
+        return;
 
     neuralStarted = true;
 
@@ -608,11 +816,12 @@ function startNeural() {
         new THREE.PerspectiveCamera(
             60,
             innerWidth / innerHeight,
-            0.1,
+            .1,
             1000
         );
 
-    camera.position.z = 8;
+    camera.position.z =
+        8;
 
 
     renderer =
@@ -629,7 +838,7 @@ function startNeural() {
 
     renderer.setPixelRatio(
         Math.min(
-            window.devicePixelRatio,
+            devicePixelRatio,
             2
         )
     );
@@ -651,69 +860,59 @@ function startNeural() {
 
     /* CORE */
 
-    const coreGeometry =
-        new THREE.SphereGeometry(
-            .45,
-            32,
-            32
-        );
-
-
-    const coreMaterial =
-        new THREE.MeshBasicMaterial({
-
-            color: 0xff6500
-
-        });
-
-
     const core =
         new THREE.Mesh(
-            coreGeometry,
-            coreMaterial
-        );
 
+            new THREE.SphereGeometry(
+                .45,
+                32,
+                32
+            ),
+
+            new THREE.MeshBasicMaterial({
+                color: 0xff6500
+            })
+
+        );
 
     neuralGroup.add(core);
 
 
     /* NEURONS */
 
-    for (let i = 0; i < 180; i++) {
+    const COUNT =
+        300;
 
-        const geometry =
-            new THREE.SphereGeometry(
-                .025 +
-                Math.random() * .025,
-                8,
-                8
-            );
-
-
-        const material =
-            new THREE.MeshBasicMaterial({
-
-                color: 0xff6500
-
-            });
-
+    for (
+        let i = 0;
+        i < COUNT;
+        i++
+    ) {
 
         const node =
             new THREE.Mesh(
-                geometry,
-                material
+
+                new THREE.SphereGeometry(
+                    .018 +
+                    Math.random() * .035,
+                    8,
+                    8
+                ),
+
+                new THREE.MeshBasicMaterial({
+                    color: 0xff6500
+                })
+
             );
 
 
         const radius =
-            1 +
-            Math.random() * 2.7;
-
+            .8 +
+            Math.random() * 3.2;
 
         const theta =
             Math.random() *
             Math.PI * 2;
-
 
         const phi =
             Math.acos(
@@ -737,15 +936,23 @@ function startNeural() {
         );
 
 
-        neuralGroup.add(node);
+        neuralGroup.add(
+            node
+        );
 
-        nodes.push(node);
+        nodes.push(
+            node
+        );
     }
 
 
     /* CONNECTIONS */
 
-    for (let i = 0; i < 130; i++) {
+    for (
+        let i = 0;
+        i < 250;
+        i++
+    ) {
 
         const a =
             nodes[
@@ -754,7 +961,6 @@ function startNeural() {
                     nodes.length
                 )
             ];
-
 
         const b =
             nodes[
@@ -765,18 +971,14 @@ function startNeural() {
             ];
 
 
-        const points = [
-
-            a.position.clone(),
-
-            b.position.clone()
-
-        ];
-
-
         const geometry =
             new THREE.BufferGeometry()
-                .setFromPoints(points);
+                .setFromPoints([
+
+                    a.position,
+                    b.position
+
+                ]);
 
 
         const material =
@@ -786,18 +988,24 @@ function startNeural() {
 
                 transparent: true,
 
-                opacity: .22
+                opacity: .18
 
             });
 
 
-        neuralGroup.add(
-
+        const line =
             new THREE.Line(
                 geometry,
                 material
-            )
+            );
 
+
+        neuralGroup.add(
+            line
+        );
+
+        lines.push(
+            line
         );
     }
 
@@ -806,9 +1014,9 @@ function startNeural() {
 }
 
 
-/* =========================================
+/* =====================================================
    NEURAL ANIMATION
-========================================= */
+===================================================== */
 
 function animateNeural() {
 
@@ -827,6 +1035,19 @@ function animateNeural() {
 
         neuralGroup.rotation.x +=
             .0005;
+
+
+        const pulse =
+            1 +
+            Math.sin(
+                Date.now() * .004
+            ) * .035;
+
+        neuralGroup.scale.set(
+            pulse,
+            pulse,
+            pulse
+        );
     }
 
 
@@ -840,33 +1061,117 @@ function animateNeural() {
 }
 
 
-/* =========================================
-   HAND TRACKING
-========================================= */
+/* =====================================================
+   NEURAL MODES
+===================================================== */
 
-if ($("handBtn"))
-    $("handBtn").onclick =
-        startHands;
+function setNeuralMode(
+    mode
+) {
+
+    if (!neuralGroup)
+        return;
+
+    const colors = {
+
+        idle: 0xff6500,
+
+        listening: 0x00aaff,
+
+        thinking: 0xffa000,
+
+        speaking: 0xff6500,
+
+        diagnostic: 0xffd000
+
+    };
 
 
-async function startHands() {
+    const color =
+        colors[mode] ||
+        0xff6500;
+
+
+    neuralGroup.traverse(
+        object => {
+
+            if (
+                object.material &&
+                object.material.color
+            ) {
+
+                object.material.color.set(
+                    color
+                );
+            }
+
+        }
+    );
+}
+
+
+/* =====================================================
+   NEURAL SCREEN
+===================================================== */
+
+$("neuralBtn").onclick =
+    showNeural;
+
+
+$("exitNeural").onclick =
+    hideNeural;
+
+
+function showNeural() {
 
     if (!online) {
 
         speak(
-            "Activate FRIDAY first."
+            "Unlock FRIDAY first."
         );
 
         return;
     }
 
+    neuralOpen = true;
+
+    $("neuralScreen").style.display =
+        "block";
+
+    startNeural();
+
+    startHands();
+}
+
+
+function hideNeural() {
+
+    neuralOpen = false;
+
+    $("neuralScreen").style.display =
+        "none";
+
+    stopCamera();
+}
+
+
+/* =====================================================
+   HAND TRACKING
+===================================================== */
+
+$("handBtn").onclick =
+    startHands;
+
+
+async function startHands() {
+
+    if (!online)
+        return;
+
 
     if (handRunning) {
 
-        $("cameraBox").style.display =
-            "none";
-
-        handRunning = false;
+        stopCamera();
 
         return;
     }
@@ -875,36 +1180,8 @@ async function startHands() {
     $("cameraBox").style.display =
         "block";
 
-
-    $("handStatus").textContent =
-        "STARTING CAMERA...";
-
-
-    const hands =
-        new Hands({
-
-            locateFile: file =>
-                `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${file}`
-
-        });
-
-
-    hands.setOptions({
-
-        maxNumHands: 1,
-
-        modelComplexity: 1,
-
-        minDetectionConfidence: .65,
-
-        minTrackingConfidence: .65
-
-    });
-
-
-    hands.onResults(
-        handleHands
-    );
+    $("cameraState").textContent =
+        "STARTING";
 
 
     try {
@@ -914,10 +1191,7 @@ async function startHands() {
                 .getUserMedia({
 
                     video: {
-
-                        facingMode:
-                            "user"
-
+                        facingMode: "user"
                     },
 
                     audio: false
@@ -929,40 +1203,70 @@ async function startHands() {
             stream;
 
 
-        handRunning = true;
+        const hands =
+            new Hands({
 
-
-        $("handStatus").textContent =
-            "HAND TRACKING ACTIVE";
-
-
-        async function processFrame() {
-
-            if (!handRunning)
-                return;
-
-            await hands.send({
-
-                image: $("video")
+                locateFile:
+                    file =>
+                    `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${file}`
 
             });
 
 
+        hands.setOptions({
+
+            maxNumHands: 1,
+
+            modelComplexity: 1,
+
+            minDetectionConfidence: .65,
+
+            minTrackingConfidence: .65
+
+        });
+
+
+        hands.onResults(
+            handResults
+        );
+
+
+        handRunning = true;
+
+        $("cameraState").textContent =
+            "READY";
+
+
+        async function loop() {
+
+            if (!handRunning)
+                return;
+
+            if (
+                $("video").readyState >= 2
+            ) {
+
+                await hands.send({
+                    image: $("video")
+                });
+
+            }
+
             requestAnimationFrame(
-                processFrame
+                loop
             );
         }
 
 
-        processFrame();
+        loop();
 
 
     } catch (error) {
 
         console.error(error);
 
-        $("handStatus").textContent =
-            "CAMERA PERMISSION REQUIRED";
+        $("cameraState").textContent =
+            "DENIED";
 
         speak(
             "Camera permission is required."
@@ -971,24 +1275,26 @@ async function startHands() {
 }
 
 
-/* =========================================
-   HAND → NEURAL ROTATION
-========================================= */
+/* =====================================================
+   HAND RESULTS
+===================================================== */
 
-function handleHands(results) {
+function handResults(
+    results
+) {
 
     const canvas =
         $("handCanvas");
 
-    canvas.width =
-        innerWidth;
-
-    canvas.height =
-        innerHeight;
-
-
     const ctx =
         canvas.getContext("2d");
+
+
+    canvas.width =
+        $("cameraBox").clientWidth;
+
+    canvas.height =
+        $("cameraBox").clientHeight;
 
 
     ctx.clearRect(
@@ -1001,14 +1307,11 @@ function handleHands(results) {
 
     if (
         !results.multiHandLandmarks ||
-        results.multiHandLandmarks.length === 0
+        !results.multiHandLandmarks.length
     ) {
 
         $("handStatus").textContent =
             "HAND NOT FOUND";
-
-        lastHandX = null;
-        lastHandY = null;
 
         return;
     }
@@ -1019,44 +1322,40 @@ function handleHands(results) {
 
 
     $("handStatus").textContent =
-        "HAND TRACKING ACTIVE";
+        "HAND ACTIVE";
 
 
-    /* DRAW HAND */
+    /* DRAW */
 
-    for (const point of hand) {
+    hand.forEach(
+        point => {
 
-        const x =
-            point.x *
-            innerWidth;
+            const x =
+                point.x *
+                canvas.width;
 
-        const y =
-            point.y *
-            innerHeight;
-
-
-        ctx.beginPath();
-
-        ctx.arc(
-            x,
-            y,
-            4,
-            0,
-            Math.PI * 2
-        );
+            const y =
+                point.y *
+                canvas.height;
 
 
-        ctx.fillStyle =
-            "#ff6500";
+            ctx.beginPath();
 
-        ctx.shadowBlur =
-            15;
+            ctx.arc(
+                x,
+                y,
+                3,
+                0,
+                Math.PI * 2
+            );
 
-        ctx.shadowColor =
-            "#ff6500";
+            ctx.fillStyle =
+                "#ff6500";
 
-        ctx.fill();
-    }
+            ctx.fill();
+
+        }
+    );
 
 
     /* PALM */
@@ -1066,34 +1365,54 @@ function handleHands(results) {
 
 
     if (
-        lastHandX !== null &&
-        lastHandY !== null &&
+        lastPalmX !== null &&
         neuralGroup
     ) {
 
         const dx =
             palm.x -
-            lastHandX;
-
+            lastPalmX;
 
         const dy =
             palm.y -
-            lastHandY;
+            lastPalmY;
 
 
         neuralGroup.rotation.y +=
             dx * 8;
 
-
         neuralGroup.rotation.x +=
             dy * 6;
+
+
+        /* SWIPE */
+
+        if (
+            Math.abs(dx) > .12 &&
+            Date.now() - lastSwipe > 700
+        ) {
+
+            lastSwipe =
+                Date.now();
+
+            if (dx > 0) {
+
+                $("gesture").textContent =
+                    "➡ SWIPE RIGHT";
+
+            } else {
+
+                $("gesture").textContent =
+                    "⬅ SWIPE LEFT";
+            }
+        }
     }
 
 
-    lastHandX =
+    lastPalmX =
         palm.x;
 
-    lastHandY =
+    lastPalmY =
         palm.y;
 
 
@@ -1118,35 +1437,66 @@ function handleHands(results) {
         );
 
 
-    if (distance < .065) {
+    if (distance < .06) {
+
+        $("gesture").textContent =
+            "🤏 PINCH";
 
         if (!pinch) {
 
             pinch = true;
 
-            $("gesture").textContent =
-                "🤏 PINCH — SELECT";
-
-            selectNeural();
+            selectNeuron();
         }
 
     } else {
 
         pinch = false;
+    }
+
+
+    /* TWO FINGER ZOOM */
+
+    const indexUp =
+        hand[8].y <
+        hand[6].y;
+
+    const middleUp =
+        hand[12].y <
+        hand[10].y;
+
+
+    if (
+        indexUp &&
+        middleUp &&
+        distance > .08
+    ) {
 
         $("gesture").textContent =
-            "✋ HAND — ROTATE";
+            "✌ ZOOM";
+
+        camera.position.z =
+            Math.max(
+                4,
+                Math.min(
+                    12,
+                    camera.position.z -
+                    (palm.y - .5) * .03
+                )
+            );
     }
 
 
     /* OPEN PALM */
 
-    if (isOpen(hand)) {
+    if (
+        isOpenPalm(hand)
+    ) {
 
         neuralPaused = true;
 
         $("gesture").textContent =
-            "🖐 OPEN PALM — PAUSED";
+            "🖐 PAUSED";
 
     } else {
 
@@ -1155,11 +1505,11 @@ function handleHands(results) {
 }
 
 
-/* =========================================
+/* =====================================================
    OPEN PALM
-========================================= */
+===================================================== */
 
-function isOpen(hand) {
+function isOpenPalm(hand) {
 
     return (
 
@@ -1179,11 +1529,11 @@ function isOpen(hand) {
 }
 
 
-/* =========================================
-   PINCH SELECT
-========================================= */
+/* =====================================================
+   SELECT NEURON
+===================================================== */
 
-function selectNeural() {
+function selectNeuron() {
 
     if (!nodes.length)
         return;
@@ -1199,117 +1549,275 @@ function selectNeural() {
 
 
     node.scale.set(
-        4,
-        4,
-        4
+        5,
+        5,
+        5
     );
 
 
-    setTimeout(() => {
+    setTimeout(
+        () => {
 
-        node.scale.set(
-            1,
-            1,
-            1
-        );
+            node.scale.set(
+                1,
+                1,
+                1
+            );
 
-    }, 500);
+        },
+        400
+    );
 }
 
 
-/* =========================================
-   CLOSE CAMERA
-========================================= */
+/* =====================================================
+   STOP CAMERA
+===================================================== */
 
-if ($("closeHand")) {
+$("closeHand").onclick =
+    stopCamera;
 
-    $("closeHand").onclick = () => {
 
-        handRunning = false;
+function stopCamera() {
 
-        lastHandX = null;
-        lastHandY = null;
+    handRunning = false;
 
-        const video =
-            $("video");
+    lastPalmX = null;
+    lastPalmY = null;
 
-        if (video.srcObject) {
+    const video =
+        $("video");
 
-            video.srcObject
-                .getTracks()
-                .forEach(
-                    track =>
-                        track.stop()
-                );
-        }
 
-        $("cameraBox").style.display =
+    if (video.srcObject) {
+
+        video.srcObject
+            .getTracks()
+            .forEach(
+                track =>
+                    track.stop()
+            );
+
+        video.srcObject =
+            null;
+    }
+
+
+    $("cameraBox").style.display =
+        "none";
+
+    $("cameraState").textContent =
+        "STANDBY";
+}
+
+
+/* =====================================================
+   DIAGNOSTICS
+===================================================== */
+
+$("diagnosticBtn").onclick =
+    showDiagnostics;
+
+
+$("closeDiagnostic").onclick =
+    () => {
+
+        $("diagnosticPanel").style.display =
             "none";
     };
+
+
+function showDiagnostics() {
+
+    $("diagnosticPanel").style.display =
+        "block";
+
+    setNeuralMode(
+        "diagnostic"
+    );
 }
 
 
-/* =========================================
+/* =====================================================
    LOGIN
-========================================= */
+===================================================== */
 
-if ($("loginBtn")) {
-
-    $("loginBtn").onclick = () => {
+$("loginBtn").onclick =
+    () => {
 
         $("loginPanel").style.display =
             "grid";
-
     };
-}
 
 
-if ($("closeLogin")) {
-
-    $("closeLogin").onclick = () => {
+$("closeLogin").onclick =
+    () => {
 
         $("loginPanel").style.display =
             "none";
-
     };
-}
 
 
-if ($("loginSubmit")) {
+$("loginSubmit").onclick =
+    () => {
 
-    $("loginSubmit").onclick = () => {
-
-        const user =
+        const username =
             $("username").value.trim();
 
-        const pass =
+        const password =
             $("password").value.trim();
 
 
-        if (!user || !pass) {
+        if (
+            !username ||
+            !password
+        ) {
 
             $("loginStatus").textContent =
-                "AUTHORIZATION REQUIRED";
+                "ENTER CREDENTIALS";
 
             return;
         }
 
 
         $("loginStatus").textContent =
-            "AUTHENTICATION ACCEPTED";
+            "ACCESS GRANTED";
+
+        speak(
+            "Authorization accepted."
+        );
+
+
+        setTimeout(
+            () => {
+
+                $("loginPanel")
+                    .style.display =
+                    "none";
+
+            },
+            900
+        );
     };
+
+
+/* =====================================================
+   HEY FRIDAY WAKE MODE
+===================================================== */
+
+function startWakeWord() {
+
+    const SR =
+        window.SpeechRecognition ||
+        window.webkitSpeechRecognition;
+
+    if (!SR)
+        return;
+
+
+    const wake =
+        new SR();
+
+    wake.lang =
+        "en-US";
+
+    wake.continuous =
+        true;
+
+    wake.interimResults =
+        true;
+
+
+    wake.onresult =
+        event => {
+
+            let text = "";
+
+            for (
+                let i =
+                    event.resultIndex;
+                i <
+                    event.results.length;
+                i++
+            ) {
+
+                text +=
+                    event.results[i][0]
+                        .transcript;
+            }
+
+
+            text =
+                text.toLowerCase();
+
+
+            if (
+                text.includes(
+                    "hey friday"
+                )
+            ) {
+
+                if (!online) {
+
+                    unlockFriday();
+
+                } else {
+
+                    speak(
+                        "Yes Boss?"
+                    );
+
+                }
+            }
+        };
+
+
+    wake.onerror =
+        () => {
+
+            setTimeout(
+                startWakeWord,
+                2000
+            );
+
+        };
+
+
+    wake.onend =
+        () => {
+
+            setTimeout(
+                startWakeWord,
+                500
+            );
+
+        };
+
+
+    try {
+
+        wake.start();
+
+    } catch(e) {}
 }
 
 
-/* =========================================
+setTimeout(
+    startWakeWord,
+    2000
+);
+
+
+/* =====================================================
    RESIZE
-========================================= */
+===================================================== */
 
 window.addEventListener(
     "resize",
     () => {
 
-        if (!camera || !renderer)
+        if (!camera ||
+            !renderer)
             return;
 
 
@@ -1325,5 +1833,23 @@ window.addEventListener(
             innerWidth,
             innerHeight
         );
+
     }
+);
+
+
+/* =====================================================
+   START
+===================================================== */
+
+startNeural();
+
+$("coreState").textContent =
+    "STANDBY";
+
+$("systemMode").textContent =
+    "SLEEP";
+
+setNeuralMode(
+    "idle"
 );
