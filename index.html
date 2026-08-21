@@ -1,169 +1,142 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
 <meta charset="UTF-8">
-<meta name="viewport"
-      content="width=device-width,initial-scale=1.0">
+<meta name="viewport" content="width=device-width,initial-scale=1">
 
-<title>FRIDAY MARK 6</title>
+<title>FRIDAY MARK 6 </title>
 
 <link rel="stylesheet" href="style.css">
 
 <script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script>
+
 <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js"></script>
 
 </head>
 
 <body class="locked">
 
-<!-- BACKGROUND -->
-<div class="grid"></div>
-
-<!-- TOP BAR -->
 <header>
 
-    <div>
-        <div class="logo">FRIDAY</div>
-        <div class="version">MARK 6</div>
-    </div>
+  <div>
+    <small>STARK SYSTEMS</small>
+    <h1>F.R.I.D.A.Y <span>MK 2.3</span></h1>
+  </div>
 
-    <div id="status">
-        FRIDAY — SLEEP MODE
-    </div>
-
-    <button id="loginBtn">
-        LOGIN
-    </button>
+  <button id="loginBtn">LOGIN</button>
 
 </header>
 
 
-<!-- MAIN NEURAL CORE -->
 <main>
 
-    <canvas id="neuralCanvas"></canvas>
+<!-- FRIDAY CORE -->
 
-    <div class="coreHUD">
+<section class="coreArea">
 
-        <div id="coreRing"></div>
+  <div class="hud">
 
-        <div id="coreText">
-            F
-        </div>
+    <div class="ring outer"></div>
+    <div class="ring middle"></div>
+    <div class="ring inner"></div>
 
-        <div id="modeText">
-            SLEEP MODE
-        </div>
+    <div class="arc arc1"></div>
+    <div class="arc arc2"></div>
 
-    </div>
+    <div class="core">
 
-</main>
+      <div class="pulse"></div>
 
-
-<!-- COMMAND PANEL -->
-
-<section class="commandPanel">
-
-    <div id="reply">
-        SYSTEM STANDBY
-    </div>
-
-    <div class="commandRow">
-
-        <input
-            id="command"
-            disabled
-            placeholder="FRIDAY is sleeping..."
-            autocomplete="off"
-        >
-
-        <button id="voiceBtn">
-            🎤
-        </button>
-
-        <button id="sendBtn">
-            ➤
-        </button>
+      <b>FRIDAY</b>
 
     </div>
+
+  </div>
+
+  <div id="status">
+    FRIDAY — SLEEP MODE
+  </div>
 
 </section>
 
 
-<!-- MAIN BUTTONS -->
+<!-- CONTROLS -->
 
 <div class="controls">
 
-    <button id="unlockBtn">
-        🔓
-        <small>UNLOCK</small>
-    </button>
+  <button id="unlockBtn">
+    🔓
+    <small>UNLOCK</small>
+  </button>
 
-    <button id="neuralBtn">
-        🧠
-        <small>NEURAL</small>
-    </button>
+  <button id="voiceBtn">
+    🎤
+    <small>VOICE</small>
+  </button>
 
-    <button id="handBtn">
-        ✋
-        <small>HAND</small>
-    </button>
+  <button id="neuralBtn">
+    🧠
+    <small>NEURAL</small>
+  </button>
 
-    <button id="diagnosticBtn">
-        ⚡
-        <small>SYSTEM</small>
-    </button>
-
-</div>
-
-
-<!-- COMMAND HISTORY -->
-
-<div id="historyPanel">
-
-    <div class="panelTitle">
-        COMMAND HISTORY
-    </div>
-
-    <div id="history"></div>
+  <button id="handBtn">
+    ✋
+    <small>HAND</small>
+  </button>
 
 </div>
 
 
-<!-- SPEAKING WAVEFORM -->
+<!-- COMMAND -->
 
-<div id="voiceWave">
+<div class="command">
 
-    <div id="waveBars"></div>
+  <input
+    id="command"
+    placeholder="FRIDAY is sleeping..."
+    disabled
+  >
 
-    <div id="voiceTime">
-        FRIDAY — SPEAKING
-    </div>
+  <button id="sendBtn">➤</button>
 
 </div>
 
+<div id="reply">
+  SYSTEM STANDBY
+</div>
 
-<!-- NEURAL SCREEN -->
+</main>
+
+
+<!-- NEURAL SYSTEM -->
 
 <div id="neuralScreen">
 
-    <button id="exitNeural">
-        ✕
-    </button>
+  <div class="neuralHeader">
 
-    <div class="neuralTitle">
-        NEURAL CONTROL
+    <div>
+      <small>FRIDAY NEURAL CORE</small>
+      <h2>NEURAL SYSTEM</h2>
     </div>
 
-    <div class="neuralInfo">
-        MOVE HAND TO ROTATE
-        <br>
-        🤏 PINCH = SELECT
-        <br>
-        🖐 PALM = PAUSE
-        <br>
-        ✌ TWO FINGERS = ZOOM
-    </div>
+    <button id="exitNeural">EXIT</button>
+
+  </div>
+
+  <canvas id="neuralCanvas"></canvas>
+
+  <div class="neuralInfo">
+
+    <b>HAND CONTROL</b>
+
+    <br>
+
+    <span id="gesture">
+      HAND TRACKING OFF
+    </span>
+
+  </div>
 
 </div>
 
@@ -172,71 +145,17 @@
 
 <div id="cameraBox">
 
-    <video id="video"
-           autoplay
-           playsinline>
-    </video>
+  <video id="video" autoplay playsinline></video>
 
-    <canvas id="handCanvas"></canvas>
+  <canvas id="handCanvas"></canvas>
 
-    <div id="handStatus">
-        HAND TRACKING
-    </div>
+  <div>
+    <b>HAND TRACKING</b>
+    <br>
+    <span id="handStatus">SEARCHING...</span>
+  </div>
 
-    <div id="gesture">
-        READY
-    </div>
-
-    <button id="closeHand">
-        ✕
-    </button>
-
-</div>
-
-
-<!-- DIAGNOSTICS -->
-
-<div id="diagnosticPanel">
-
-    <button id="closeDiagnostic">
-        ✕
-    </button>
-
-    <h2>FRIDAY SYSTEM</h2>
-
-    <div class="diagnosticGrid">
-
-        <div>
-            <span>CORE</span>
-            <b id="coreState">ONLINE</b>
-        </div>
-
-        <div>
-            <span>VOICE</span>
-            <b id="voiceState">READY</b>
-        </div>
-
-        <div>
-            <span>CAMERA</span>
-            <b id="cameraState">STANDBY</b>
-        </div>
-
-        <div>
-            <span>NEURAL</span>
-            <b id="neuralState">ACTIVE</b>
-        </div>
-
-        <div>
-            <span>NETWORK</span>
-            <b id="networkState">ONLINE</b>
-        </div>
-
-        <div>
-            <span>MODE</span>
-            <b id="systemMode">SLEEP</b>
-        </div>
-
-    </div>
+  <button id="closeHand">✕</button>
 
 </div>
 
@@ -245,36 +164,36 @@
 
 <div id="loginPanel">
 
-    <div class="loginBox">
+  <div class="loginBox">
 
-        <button id="closeLogin">
-            ✕
-        </button>
+    <button id="closeLogin">✕</button>
 
-        <h2>FRIDAY ACCESS</h2>
+    <div class="loginLogo">F</div>
 
-        <input
-            id="username"
-            placeholder="Username"
-        >
+    <h2>FRIDAY LOGIN</h2>
 
-        <input
-            id="password"
-            type="password"
-            placeholder="Password"
-        >
+    <small>AUTHORIZATION REQUIRED</small>
 
-        <button id="loginSubmit">
-            AUTHORIZE
-        </button>
+    <input id="username" placeholder="USERNAME">
 
-        <div id="loginStatus">
-            AWAITING AUTHORIZATION
-        </div>
+    <input id="password"
+           type="password"
+           placeholder="PASSWORD">
 
-    </div>
+    <button id="loginSubmit">
+      AUTHENTICATE
+    </button>
+
+    <p id="loginStatus"></p>
+
+  </div>
 
 </div>
+
+
+<!-- TRANSITION -->
+
+<div id="transition"></div>
 
 
 <script src="script.js"></script>
