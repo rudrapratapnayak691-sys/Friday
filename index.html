@@ -1,161 +1,150 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="viewport"
+      content="width=device-width,initial-scale=1.0">
 
-<title>FRIDAY MARK 6 </title>
+<title>FRIDAY MARK 5</title>
 
 <link rel="stylesheet" href="style.css">
 
-<script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 
 <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js"></script>
-
 </head>
 
 <body class="locked">
 
 <header>
+    <div>
+        <div class="system">S T A R K &nbsp; S Y S T E M S</div>
 
-  <div>
-    <small>STARK SYSTEMS</small>
-    <h1>F.R.I.D.A.Y <span>MK 2.3</span></h1>
-  </div>
+        <div class="logo">
+            F.R.I.D.A.Y
+            <span>MK 2.3</span>
+        </div>
+    </div>
 
-  <button id="loginBtn">LOGIN</button>
+    <button id="loginBtn" class="loginBtn">
+        LOGIN
+    </button>
 
+    <div id="profileBtn"
+         class="profileBtn"
+         style="display:none;">
+        👤 <span id="profileName">PROFILE</span>
+    </div>
 </header>
-
 
 <main>
 
-<!-- FRIDAY CORE -->
+    <div id="status">
+        FRIDAY — SLEEP MODE
+    </div>
 
-<section class="coreArea">
+    <!-- MAIN FRIDAY CORE -->
 
-  <div class="hud">
+    <div class="coreArea">
 
-    <div class="ring outer"></div>
-    <div class="ring middle"></div>
-    <div class="ring inner"></div>
+        <div class="rings r1"></div>
+        <div class="rings r2"></div>
+        <div class="rings r3"></div>
 
-    <div class="arc arc1"></div>
-    <div class="arc arc2"></div>
+        <div class="core"></div>
 
-    <div class="core">
-
-      <div class="pulse"></div>
-
-      <b>FRIDAY</b>
+        <div class="fridayText">
+            FRIDAY
+        </div>
 
     </div>
 
-  </div>
+    <!-- BUTTONS -->
 
-  <div id="status">
-    FRIDAY — SLEEP MODE
-  </div>
+    <div class="buttons">
 
-</section>
+        <button id="unlockBtn">
+            🔓
+            <small>UNLOCK</small>
+        </button>
 
+        <button id="voiceBtn">
+            🎤
+            <small>VOICE</small>
+        </button>
 
-<!-- CONTROLS -->
+        <button id="neuralBtn">
+            🧠
+            <small>NEURAL</small>
+        </button>
 
-<div class="controls">
+        <button id="handBtn">
+            ✋
+            <small>HAND</small>
+        </button>
 
-  <button id="unlockBtn">
-    🔓
-    <small>UNLOCK</small>
-  </button>
+    </div>
 
-  <button id="voiceBtn">
-    🎤
-    <small>VOICE</small>
-  </button>
+    <div id="reply">
+        SYSTEM STANDBY
+    </div>
 
-  <button id="neuralBtn">
-    🧠
-    <small>NEURAL</small>
-  </button>
+    <!-- COMMAND -->
 
-  <button id="handBtn">
-    ✋
-    <small>HAND</small>
-  </button>
+    <div class="commandArea">
 
-</div>
+        <input
+            id="command"
+            type="text"
+            disabled
+            placeholder="FRIDAY is sleeping..."
+        >
 
+        <button id="sendBtn">
+            ➤
+        </button>
 
-<!-- COMMAND -->
-
-<div class="command">
-
-  <input
-    id="command"
-    placeholder="FRIDAY is sleeping..."
-    disabled
-  >
-
-  <button id="sendBtn">➤</button>
-
-</div>
-
-<div id="reply">
-  SYSTEM STANDBY
-</div>
+    </div>
 
 </main>
-
-
-<!-- NEURAL SYSTEM -->
-
-<div id="neuralScreen">
-
-  <div class="neuralHeader">
-
-    <div>
-      <small>FRIDAY NEURAL CORE</small>
-      <h2>NEURAL SYSTEM</h2>
-    </div>
-
-    <button id="exitNeural">EXIT</button>
-
-  </div>
-
-  <canvas id="neuralCanvas"></canvas>
-
-  <div class="neuralInfo">
-
-    <b>HAND CONTROL</b>
-
-    <br>
-
-    <span id="gesture">
-      HAND TRACKING OFF
-    </span>
-
-  </div>
-
-</div>
 
 
 <!-- CAMERA -->
 
 <div id="cameraBox">
 
-  <video id="video" autoplay playsinline></video>
+    <button id="closeHand">
+        ✕
+    </button>
 
-  <canvas id="handCanvas"></canvas>
+    <video
+        id="video"
+        autoplay
+        playsinline>
+    </video>
 
-  <div>
-    <b>HAND TRACKING</b>
-    <br>
-    <span id="handStatus">SEARCHING...</span>
-  </div>
+    <canvas id="handCanvas"></canvas>
 
-  <button id="closeHand">✕</button>
+    <div id="handStatus">
+        HAND TRACKING
+    </div>
+
+    <div id="gesture">
+        ✋ HAND — ROTATE
+    </div>
+
+</div>
+
+
+<!-- NEURAL SCREEN -->
+
+<div id="neuralScreen">
+
+    <button id="exitNeural">
+        ✕ CLOSE
+    </button>
+
+    <canvas id="neuralCanvas"></canvas>
 
 </div>
 
@@ -164,36 +153,78 @@
 
 <div id="loginPanel">
 
-  <div class="loginBox">
+    <div class="loginBox">
 
-    <button id="closeLogin">✕</button>
+        <button id="closeLogin"
+                class="closeLogin">
+            ✕
+        </button>
 
-    <div class="loginLogo">F</div>
+        <h2 id="loginTitle">
+            FRIDAY LOGIN
+        </h2>
 
-    <h2>FRIDAY LOGIN</h2>
+        <p id="loginSubtitle">
+            CREATE YOUR FRIDAY ACCOUNT
+        </p>
 
-    <small>AUTHORIZATION REQUIRED</small>
+        <input
+            id="username"
+            type="email"
+            placeholder="Email">
 
-    <input id="username" placeholder="USERNAME">
+        <input
+            id="password"
+            type="password"
+            placeholder="Password">
 
-    <input id="password"
-           type="password"
-           placeholder="PASSWORD">
+        <input
+            id="confirmPassword"
+            type="password"
+            placeholder="Confirm Password">
 
-    <button id="loginSubmit">
-      AUTHENTICATE
-    </button>
+        <button id="loginSubmit">
+            CREATE ACCOUNT
+        </button>
 
-    <p id="loginStatus"></p>
+        <button id="switchLogin"
+                class="switchBtn">
+            Already have an account? SIGN IN
+        </button>
 
-  </div>
+        <div id="loginStatus"></div>
+
+    </div>
 
 </div>
 
 
-<!-- TRANSITION -->
+<!-- PROFILE -->
 
-<div id="transition"></div>
+<div id="profilePanel">
+
+    <div class="profileBox">
+
+        <button id="closeProfile"
+                class="closeLogin">
+            ✕
+        </button>
+
+        <h2>👤 PROFILE</h2>
+
+        <p id="profileEmail"></p>
+
+        <div class="profileStatus">
+            ● ACCOUNT ACTIVE
+        </div>
+
+        <button id="logoutBtn">
+            LOG OUT
+        </button>
+
+    </div>
+
+</div>
 
 
 <script src="script.js"></script>
