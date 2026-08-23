@@ -1,5 +1,5 @@
 /* =========================================
-   FRIDAY MK 2.3
+   FRIDAY MK 2.3 + GEMINI AI
 ========================================= */
 
 const $ = id => document.getElementById(id);
@@ -385,10 +385,107 @@ function runCommand(text) {
 
 
     /* =====================================
-       NORMAL GOOGLE SEARCH
+       GEMINI AI
     ===================================== */
 
-    searchGoogle(text);
+    askGemini(text);
+}
+
+
+/* =========================================
+   GEMINI AI
+========================================= */
+
+async function askGemini(question) {
+
+    if (!online) {
+
+        speak(
+            "Please activate FRIDAY first."
+        );
+
+        return;
+    }
+
+
+    $("status").textContent =
+        "FRIDAY — THINKING...";
+
+    $("reply").textContent =
+        "FRIDAY IS THINKING...";
+
+
+    try {
+
+        const response =
+            await fetch(
+                "https://friday-ikry.onrender.com/ask",
+                {
+
+                    method: "POST",
+
+                    headers: {
+                        "Content-Type":
+                            "application/json"
+                    },
+
+                    body: JSON.stringify({
+                        question: question
+                    })
+
+                }
+            );
+
+
+        const data =
+            await response.json();
+
+
+        if (!response.ok ||
+            data.error) {
+
+            throw new Error(
+                data.error ||
+                "Gemini request failed"
+            );
+        }
+
+
+        const answer =
+            data.answer;
+
+
+        $("status").textContent =
+            "FRIDAY — ONLINE";
+
+
+        $("reply").textContent =
+            "FRIDAY: " + answer;
+
+
+        speak(answer);
+
+
+    } catch (error) {
+
+        console.error(
+            "Gemini Error:",
+            error
+        );
+
+
+        $("status").textContent =
+            "FRIDAY — ONLINE";
+
+
+        $("reply").textContent =
+            "FRIDAY: AI connection failed.";
+
+
+        speak(
+            "I couldn't connect to my AI brain."
+        );
+    }
 }
 
 
