@@ -1,289 +1,202 @@
 <!DOCTYPE html>
-<html lang="en">
-
+<html>
 <head>
-
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
 
-<meta name="viewport"
-      content="width=device-width, initial-scale=1.0">
+<title>FRIDAY MARK 5</title>
 
-<title>FRIDAY MK 2.3</title>
+<link rel="stylesheet" href="style.css">
 
-<link rel="icon"
-      type="image/png"
-      href="icon.png">
+<script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script>
 
-<link rel="stylesheet"
-      href="style.css">
-
-<!-- THREE.JS -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-
-<!-- MEDIAPIPE HANDS -->
 <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js"></script>
 
 </head>
 
-
 <body class="locked">
 
+<header>
 
-<!-- =====================================
-     FRIDAY OPENING ANIMATION
-===================================== -->
+  <div>
+    <small>STARK SYSTEMS</small>
+    <h1>F.R.I.D.A.Y <span>MK 2.3</span></h1>
+  </div>
 
-<div id="fridayIntro">
+  <button id="loginBtn">LOGIN</button>
 
-    <img
-        src="icon.png"
-        id="introLogo"
-        alt="FRIDAY">
+</header>
+
+
+<main>
+
+<!-- FRIDAY CORE -->
+
+<section class="coreArea">
+
+  <div class="hud">
+
+    <div class="ring outer"></div>
+    <div class="ring middle"></div>
+    <div class="ring inner"></div>
+
+    <div class="arc arc1"></div>
+    <div class="arc arc2"></div>
+
+    <div class="core">
+
+      <div class="pulse"></div>
+
+      <b>FRIDAY</b>
+
+    </div>
+
+  </div>
+
+  <div id="status">
+    FRIDAY — SLEEP MODE
+  </div>
+
+</section>
+
+
+<!-- CONTROLS -->
+
+<div class="controls">
+
+  <button id="unlockBtn">
+    🔓
+    <small>UNLOCK</small>
+  </button>
+
+  <button id="voiceBtn">
+    🎤
+    <small>VOICE</small>
+  </button>
+
+  <button id="neuralBtn">
+    🧠
+    <small>NEURAL</small>
+  </button>
+
+  <button id="handBtn">
+    ✋
+    <small>HAND</small>
+  </button>
 
 </div>
 
 
-<!-- =====================================
-     MAIN FRIDAY UI
-===================================== -->
+<!-- COMMAND -->
 
-<div id="app">
+<div class="command">
 
+  <input
+    id="command"
+    placeholder="FRIDAY is sleeping..."
+    disabled
+  >
 
-    <!-- HEADER -->
-
-    <header id="header">
-
-        <div id="brand">
-
-            <img
-                src="icon.png"
-                id="brandIcon"
-                alt="FRIDAY">
-
-            <div>
-
-                <div id="title">
-                    FRIDAY
-                </div>
-
-                <div id="version">
-                    MARK 2.3
-                </div>
-
-            </div>
-
-        </div>
-
-
-        <div id="profile">
-            GUEST
-        </div>
-
-    </header>
-
-
-    <!-- STATUS -->
-
-    <div id="status">
-        FRIDAY — SLEEP MODE
-    </div>
-
-
-    <!-- CORE -->
-
-    <div id="core">
-
-        <div id="coreRing">
-
-            <div id="coreLetter">
-                F
-            </div>
-
-        </div>
-
-    </div>
-
-
-    <!-- REPLY -->
-
-    <div id="reply">
-        SYSTEM STANDBY
-    </div>
-
-
-    <!-- COMMAND -->
-
-    <div id="inputArea">
-
-        <input
-            id="command"
-            type="text"
-            disabled
-            placeholder="FRIDAY is sleeping..."
-            autocomplete="off">
-
-        <button id="sendBtn">
-            SEND
-        </button>
-
-    </div>
-
-
-    <!-- MAIN BUTTONS -->
-
-    <div id="controls">
-
-        <button id="unlockBtn">
-            🔓
-            <small>UNLOCK</small>
-        </button>
-
-        <button id="voiceBtn">
-            🎤
-        </button>
-
-        <button id="neuralBtn">
-            🧠
-        </button>
-
-        <button id="handBtn">
-            ✋
-        </button>
-
-        <button id="loginBtn">
-            👤
-        </button>
-
-    </div>
-
+  <button id="sendBtn">➤</button>
 
 </div>
 
+<div id="reply">
+  SYSTEM STANDBY
+</div>
 
-<!-- =====================================
-     NEURAL SCREEN
-===================================== -->
+</main>
+
+
+<!-- NEURAL SYSTEM -->
 
 <div id="neuralScreen">
 
-    <canvas id="neuralCanvas"></canvas>
+  <div class="neuralHeader">
 
-    <button id="exitNeural">
-        ✕
-    </button>
+    <div>
+      <small>FRIDAY NEURAL CORE</small>
+      <h2>NEURAL SYSTEM</h2>
+    </div>
+
+    <button id="exitNeural">EXIT</button>
+
+  </div>
+
+  <canvas id="neuralCanvas"></canvas>
+
+  <div class="neuralInfo">
+
+    <b>HAND CONTROL</b>
+
+    <br>
+
+    <span id="gesture">
+      HAND TRACKING OFF
+    </span>
+
+  </div>
 
 </div>
 
 
-<!-- =====================================
-     CAMERA
-===================================== -->
+<!-- CAMERA -->
 
 <div id="cameraBox">
 
-    <video
-        id="video"
-        autoplay
-        playsinline>
-    </video>
+  <video id="video" autoplay playsinline></video>
 
-    <div id="handStatus">
-        CAMERA OFF
-    </div>
+  <canvas id="handCanvas"></canvas>
 
-    <div id="gesture">
-        ✋ HAND
-    </div>
+  <div>
+    <b>HAND TRACKING</b>
+    <br>
+    <span id="handStatus">SEARCHING...</span>
+  </div>
 
-    <button id="closeHand">
-        CLOSE
-    </button>
+  <button id="closeHand">✕</button>
 
 </div>
 
 
-<canvas id="handCanvas"></canvas>
-
-
-<!-- =====================================
-     LOGIN
-===================================== -->
+<!-- LOGIN -->
 
 <div id="loginPanel">
 
-    <div id="loginBox">
+  <div class="loginBox">
 
-        <button id="closeLogin">
-            ✕
-        </button>
+    <button id="closeLogin">✕</button>
 
-        <h2>
-            FRIDAY LOGIN
-        </h2>
+    <div class="loginLogo">F</div>
 
-        <input
-            id="username"
-            type="email"
-            placeholder="Email">
+    <h2>FRIDAY LOGIN</h2>
 
-        <input
-            id="password"
-            type="password"
-            placeholder="Password">
+    <small>AUTHORIZATION REQUIRED</small>
 
-        <button id="loginSubmit">
-            SIGN IN
-        </button>
+    <input id="username" placeholder="USERNAME">
 
-        <div id="loginStatus">
-            ENTER CREDENTIALS
-        </div>
+    <input id="password"
+           type="password"
+           placeholder="PASSWORD">
 
-    </div>
+    <button id="loginSubmit">
+      AUTHENTICATE
+    </button>
+
+    <p id="loginStatus"></p>
+
+  </div>
 
 </div>
 
 
-<!-- =====================================
-     SCRIPT
-===================================== -->
+<!-- TRANSITION -->
+
+<div id="transition"></div>
+
 
 <script src="script.js"></script>
 
-
-<!-- =====================================
-     OPENING ANIMATION
-===================================== -->
-
-<script>
-
-setTimeout(() => {
-
-    const intro =
-        document.getElementById(
-            "fridayIntro"
-        );
-
-    if (intro) {
-
-        intro.classList.add(
-            "introFinished"
-        );
-
-        setTimeout(() => {
-
-            intro.remove();
-
-        }, 700);
-
-    }
-
-}, 2800);
-
-</script>
-
-
 </body>
-
 </html>
