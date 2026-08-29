@@ -8,970 +8,113 @@
 <meta name="viewport"
       content="width=device-width, initial-scale=1.0">
 
-<title>FRIDAY AI</title>
+<title>FRIDAY MK 2.3</title>
 
-<!-- FRIDAY ICON -->
 <link rel="icon"
       type="image/png"
       href="icon.png">
 
-<!-- THREE.JS -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-
-<!-- MEDIAPIPE -->
-<script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js"></script>
-
 <link rel="stylesheet"
       href="style.css">
 
-<style>
-
-/* =====================================
-   OPENING SCENE
-===================================== */
-
-#bootScreen {
-
-    position:fixed;
-    inset:0;
-
-    background:
-        radial-gradient(
-            circle at center,
-            #35106b 0%,
-            #12001f 35%,
-            #050008 75%,
-            #000000 100%
-        );
-
-    display:flex;
-
-    align-items:center;
-    justify-content:center;
-
-    flex-direction:column;
-
-    z-index:99999;
-
-    overflow:hidden;
-
-    animation:
-        bootFade 3.2s ease forwards;
-}
-
-
-/* PARTICLES */
-
-.boot-particle {
-
-    position:absolute;
-
-    width:3px;
-    height:3px;
-
-    background:#ffffff;
-
-    border-radius:50%;
-
-    opacity:.5;
-
-    animation:
-        particleMove
-        3s
-        linear
-        infinite;
-}
-
-
-/* LOGO */
-
-.bootLogo {
-
-    width:110px;
-    height:110px;
-
-    border-radius:32px;
-
-    border:2px solid
-        rgba(255,255,255,.8);
-
-    display:flex;
-
-    align-items:center;
-    justify-content:center;
-
-    font-size:65px;
-    font-weight:bold;
-
-    color:white;
-
-    box-shadow:
-        0 0 20px #9b00ff,
-        0 0 60px #6900ff,
-        inset 0 0 25px
-        rgba(255,255,255,.2);
-
-    animation:
-        logoPulse 1.5s
-        ease-in-out
-        infinite;
-}
-
-
-.bootTitle {
-
-    margin-top:25px;
-
-    font-size:32px;
-
-    letter-spacing:8px;
-
-    color:white;
-
-    font-weight:600;
-
-}
-
-
-.bootSubtitle {
-
-    margin-top:8px;
-
-    color:#c9a7ff;
-
-    font-size:13px;
-
-    letter-spacing:4px;
-
-}
-
-
-.bootLoading {
-
-    width:190px;
-
-    height:3px;
-
-    margin-top:35px;
-
-    background:
-        rgba(255,255,255,.15);
-
-    border-radius:10px;
-
-    overflow:hidden;
-
-}
-
-
-.bootBar {
-
-    height:100%;
-
-    width:0%;
-
-    background:white;
-
-    box-shadow:
-        0 0 15px #b000ff;
-
-    animation:
-        loading 2.5s
-        ease forwards;
-}
-
-
-@keyframes loading {
-
-    from {
-        width:0%;
-    }
-
-    to {
-        width:100%;
-    }
-
-}
-
-
-@keyframes logoPulse {
-
-    0%,100% {
-        transform:scale(1);
-    }
-
-    50% {
-        transform:scale(1.08);
-    }
-
-}
-
-
-@keyframes particleMove {
-
-    from {
-        transform:
-            translateY(100vh);
-    }
-
-    to {
-        transform:
-            translateY(-100vh);
-    }
-
-}
-
-
-@keyframes bootFade {
-
-    0%,80% {
-        opacity:1;
-        pointer-events:auto;
-    }
-
-    100% {
-        opacity:0;
-        pointer-events:none;
-        visibility:hidden;
-    }
-
-}
-
-
-/* =====================================
-   MAIN SYSTEM
-===================================== */
-
-body {
-
-    margin:0;
-
-    background:#050008;
-
-    color:white;
-
-    font-family:
-        Arial,
-        sans-serif;
-
-    overflow-x:hidden;
-
-}
-
-
-/* =====================================
-   TOP BAR
-===================================== */
-
-.topBar {
-
-    height:65px;
-
-    display:flex;
-
-    align-items:center;
-
-    justify-content:space-between;
-
-    padding:
-        0 20px;
-
-    background:
-        rgba(10,0,20,.85);
-
-    border-bottom:
-        1px solid
-        rgba(170,0,255,.3);
-
-    backdrop-filter:
-        blur(15px);
-
-}
-
-
-.brand {
-
-    display:flex;
-
-    align-items:center;
-
-    gap:12px;
-
-}
-
-
-.brandIcon {
-
-    width:40px;
-    height:40px;
-
-    border-radius:12px;
-
-    border:1px solid
-        rgba(255,255,255,.6);
-
-    display:flex;
-
-    align-items:center;
-
-    justify-content:center;
-
-    font-weight:bold;
-
-    font-size:24px;
-
-    box-shadow:
-        0 0 15px
-        rgba(170,0,255,.7);
-
-}
-
-
-.brandText {
-
-    font-size:20px;
-
-    font-weight:bold;
-
-    letter-spacing:3px;
-
-}
-
-
-.profile {
-
-    padding:
-        8px 14px;
-
-    border-radius:20px;
-
-    background:
-        rgba(255,255,255,.08);
-
-    border:
-        1px solid
-        rgba(255,255,255,.15);
-
-    font-size:13px;
-
-}
-
-
-/* =====================================
-   MAIN
-===================================== */
-
-.main {
-
-    min-height:
-        calc(100vh - 65px);
-
-    display:flex;
-
-    align-items:center;
-
-    justify-content:center;
-
-    padding:20px;
-
-    box-sizing:border-box;
-
-}
-
-
-.panel {
-
-    width:100%;
-
-    max-width:700px;
-
-    padding:30px;
-
-    border-radius:25px;
-
-    background:
-        rgba(20,5,30,.75);
-
-    border:
-        1px solid
-        rgba(180,0,255,.35);
-
-    box-shadow:
-        0 0 50px
-        rgba(120,0,255,.15);
-
-    backdrop-filter:
-        blur(20px);
-
-}
-
-
-/* =====================================
-   STATUS
-===================================== */
-
-#status {
-
-    text-align:center;
-
-    font-size:13px;
-
-    letter-spacing:3px;
-
-    color:#cfa6ff;
-
-    margin-bottom:20px;
-
-}
-
-
-/* =====================================
-   AI CORE
-===================================== */
-
-.aiCore {
-
-    width:150px;
-    height:150px;
-
-    margin:
-        10px auto 25px;
-
-    border-radius:50%;
-
-    border:
-        1px solid
-        rgba(200,100,255,.5);
-
-    display:flex;
-
-    align-items:center;
-
-    justify-content:center;
-
-    background:
-        radial-gradient(
-            circle,
-            rgba(170,0,255,.3),
-            rgba(20,0,30,.2)
-        );
-
-    box-shadow:
-        0 0 25px
-        rgba(180,0,255,.4),
-        inset 0 0 30px
-        rgba(180,0,255,.2);
-
-    animation:
-        coreFloat 4s
-        ease-in-out
-        infinite;
-
-}
-
-
-.aiCore span {
-
-    font-size:55px;
-
-    font-weight:bold;
-
-    color:white;
-
-    text-shadow:
-        0 0 15px #b000ff,
-        0 0 35px #7000ff;
-
-}
-
-
-@keyframes coreFloat {
-
-    0%,100% {
-        transform:
-            scale(1);
-    }
-
-    50% {
-        transform:
-            scale(1.06);
-    }
-
-}
-
-
-/* =====================================
-   REPLY
-===================================== */
-
-#reply {
-
-    min-height:70px;
-
-    padding:20px;
-
-    border-radius:18px;
-
-    background:
-        rgba(255,255,255,.04);
-
-    border:
-        1px solid
-        rgba(255,255,255,.08);
-
-    line-height:1.6;
-
-    margin-bottom:20px;
-
-}
-
-
-/* =====================================
-   INPUT
-===================================== */
-
-.inputRow {
-
-    display:flex;
-
-    gap:10px;
-
-}
-
-
-#command {
-
-    flex:1;
-
-    padding:15px;
-
-    border-radius:15px;
-
-    border:
-        1px solid
-        rgba(190,0,255,.4);
-
-    outline:none;
-
-    background:
-        rgba(0,0,0,.35);
-
-    color:white;
-
-    font-size:15px;
-
-}
-
-
-#command::placeholder {
-
-    color:#8d7899;
-
-}
-
-
-button {
-
-    border:none;
-
-    border-radius:15px;
-
-    padding:
-        12px 18px;
-
-    background:
-        rgba(150,0,255,.2);
-
-    color:white;
-
-    border:
-        1px solid
-        rgba(200,100,255,.4);
-
-    cursor:pointer;
-
-}
-
-
-button:active {
-
-    transform:
-        scale(.96);
-
-}
-
-
-/* =====================================
-   CONTROLS
-===================================== */
-
-.controls {
-
-    display:flex;
-
-    flex-wrap:wrap;
-
-    gap:10px;
-
-    margin-top:15px;
-
-}
-
-
-#unlockBtn {
-
-    flex:1;
-
-}
-
-
-#voiceBtn {
-
-    font-size:20px;
-
-}
-
-
-/* =====================================
-   NEURAL SCREEN
-===================================== */
-
-#neuralScreen {
-
-    position:fixed;
-
-    inset:0;
-
-    display:none;
-
-    z-index:5000;
-
-    background:
-        radial-gradient(
-            circle,
-            rgba(40,0,60,.85),
-            rgba(0,0,0,.98)
-        );
-
-}
-
-
-#neuralCanvas {
-
-    position:absolute;
-
-    inset:0;
-
-    width:100%;
-
-    height:100%;
-
-}
-
-
-#exitNeural {
-
-    position:absolute;
-
-    top:20px;
-
-    right:20px;
-
-    z-index:10;
-
-}
-
-
-/* =====================================
-   CAMERA
-===================================== */
-
-#cameraBox {
-
-    display:none;
-
-    position:fixed;
-
-    right:15px;
-
-    bottom:15px;
-
-    width:220px;
-
-    border-radius:18px;
-
-    overflow:hidden;
-
-    background:#000;
-
-    border:
-        1px solid
-        rgba(180,0,255,.5);
-
-    z-index:6000;
-
-}
-
-
-#video {
-
-    width:100%;
-
-    display:block;
-
-}
-
-
-#handCanvas {
-
-    position:fixed;
-
-    inset:0;
-
-    pointer-events:none;
-
-    z-index:5999;
-
-}
-
-
-#handStatus,
-#gesture {
-
-    padding:8px;
-
-    font-size:11px;
-
-    text-align:center;
-
-}
-
-
-#closeHand {
-
-    width:100%;
-
-}
-
-
-/* =====================================
-   LOGIN
-===================================== */
-
-#loginPanel {
-
-    position:fixed;
-
-    inset:0;
-
-    display:none;
-
-    place-items:center;
-
-    background:
-        rgba(0,0,0,.75);
-
-    backdrop-filter:
-        blur(15px);
-
-    z-index:9000;
-
-}
-
-
-.loginBox {
-
-    width:
-        min(90%,380px);
-
-    padding:30px;
-
-    border-radius:25px;
-
-    background:
-        #120018;
-
-    border:
-        1px solid
-        rgba(190,0,255,.45);
-
-    box-shadow:
-        0 0 50px
-        rgba(140,0,255,.3);
-
-}
-
-
-.loginBox h2 {
-
-    text-align:center;
-
-    letter-spacing:4px;
-
-}
-
-
-.loginBox input {
-
-    width:100%;
-
-    box-sizing:border-box;
-
-    margin:
-        8px 0;
-
-    padding:14px;
-
-    border-radius:12px;
-
-    border:
-        1px solid
-        rgba(180,0,255,.35);
-
-    background:
-        rgba(0,0,0,.4);
-
-    color:white;
-
-    outline:none;
-
-}
-
-
-#loginStatus {
-
-    text-align:center;
-
-    margin:12px 0;
-
-    font-size:12px;
-
-    color:#cda5ff;
-
-}
-
-
-</style>
+<!-- THREE.JS -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
+<!-- MEDIAPIPE HANDS -->
+<script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js"></script>
 
 </head>
 
 
-<body>
+<body class="locked">
 
 
 <!-- =====================================
-     OPENING SCENE
+     FRIDAY OPENING ANIMATION
 ===================================== -->
 
-<div id="bootScreen">
+<div id="fridayIntro">
 
-    <div class="bootLogo">
-        F
-    </div>
-
-    <div class="bootTitle">
-        FRIDAY
-    </div>
-
-    <div class="bootSubtitle">
-        ARTIFICIAL INTELLIGENCE
-    </div>
-
-    <div class="bootLoading">
-        <div class="bootBar"></div>
-    </div>
+    <img
+        src="icon.png"
+        id="introLogo"
+        alt="FRIDAY">
 
 </div>
 
 
-<!-- PARTICLES -->
-
-<div class="boot-particle"
-     style="left:8%;animation-delay:.2s"></div>
-
-<div class="boot-particle"
-     style="left:20%;animation-delay:1s"></div>
-
-<div class="boot-particle"
-     style="left:35%;animation-delay:.5s"></div>
-
-<div class="boot-particle"
-     style="left:50%;animation-delay:1.5s"></div>
-
-<div class="boot-particle"
-     style="left:67%;animation-delay:.8s"></div>
-
-<div class="boot-particle"
-     style="left:82%;animation-delay:1.3s"></div>
-
-<div class="boot-particle"
-     style="left:94%;animation-delay:.3s"></div>
-
-
 <!-- =====================================
-     TOP BAR
+     MAIN FRIDAY UI
 ===================================== -->
 
-<header class="topBar">
+<div id="app">
 
-    <div class="brand">
 
-        <div class="brandIcon">
-            F
+    <!-- HEADER -->
+
+    <header id="header">
+
+        <div id="brand">
+
+            <img
+                src="icon.png"
+                id="brandIcon"
+                alt="FRIDAY">
+
+            <div>
+
+                <div id="title">
+                    FRIDAY
+                </div>
+
+                <div id="version">
+                    MARK 2.3
+                </div>
+
+            </div>
+
         </div>
 
-        <div class="brandText">
-            FRIDAY
+
+        <div id="profile">
+            GUEST
         </div>
 
-    </div>
+    </header>
 
 
-    <div class="profile"
-         id="profile">
-
-        GUEST
-
-    </div>
-
-</header>
-
-
-<!-- =====================================
-     MAIN SYSTEM
-===================================== -->
-
-<main class="main">
-
-<div class="panel">
-
+    <!-- STATUS -->
 
     <div id="status">
         FRIDAY — SLEEP MODE
     </div>
 
 
-    <!-- AI CORE -->
+    <!-- CORE -->
 
-    <div class="aiCore">
+    <div id="core">
 
-        <span>F</span>
+        <div id="coreRing">
+
+            <div id="coreLetter">
+                F
+            </div>
+
+        </div>
 
     </div>
 
 
-    <!-- RESPONSE -->
+    <!-- REPLY -->
 
     <div id="reply">
-
         SYSTEM STANDBY
-
     </div>
 
 
     <!-- COMMAND -->
 
-    <div class="inputRow">
+    <div id="inputArea">
 
         <input
             id="command"
@@ -987,9 +130,9 @@ button:active {
     </div>
 
 
-    <!-- CONTROLS -->
+    <!-- MAIN BUTTONS -->
 
-    <div class="controls">
+    <div id="controls">
 
         <button id="unlockBtn">
             🔓
@@ -1017,26 +160,24 @@ button:active {
 
 </div>
 
-</main>
-
 
 <!-- =====================================
-     NEURAL SYSTEM
+     NEURAL SCREEN
 ===================================== -->
 
-<section id="neuralScreen">
+<div id="neuralScreen">
 
     <canvas id="neuralCanvas"></canvas>
 
     <button id="exitNeural">
-        ✕ EXIT
+        ✕
     </button>
 
-</section>
+</div>
 
 
 <!-- =====================================
-     HAND CAMERA
+     CAMERA
 ===================================== -->
 
 <div id="cameraBox">
@@ -1056,7 +197,7 @@ button:active {
     </div>
 
     <button id="closeHand">
-        CLOSE CAMERA
+        CLOSE
     </button>
 
 </div>
@@ -1071,46 +212,33 @@ button:active {
 
 <div id="loginPanel">
 
-    <div class="loginBox">
+    <div id="loginBox">
+
+        <button id="closeLogin">
+            ✕
+        </button>
 
         <h2>
-            FRIDAY
+            FRIDAY LOGIN
         </h2>
-
-        <p style="text-align:center">
-            USER AUTHENTICATION
-        </p>
-
 
         <input
             id="username"
             type="email"
             placeholder="Email">
 
-
         <input
             id="password"
             type="password"
             placeholder="Password">
 
+        <button id="loginSubmit">
+            SIGN IN
+        </button>
 
         <div id="loginStatus">
             ENTER CREDENTIALS
         </div>
-
-
-        <button
-            id="loginSubmit"
-            style="width:100%">
-            SIGN IN
-        </button>
-
-
-        <button
-            id="closeLogin"
-            style="width:100%;margin-top:10px">
-            CLOSE
-        </button>
 
     </div>
 
@@ -1118,66 +246,40 @@ button:active {
 
 
 <!-- =====================================
-     FRIDAY SCRIPT
+     SCRIPT
 ===================================== -->
 
 <script src="script.js"></script>
 
 
 <!-- =====================================
-     BOOT COMPLETE
+     OPENING ANIMATION
 ===================================== -->
 
 <script>
 
 setTimeout(() => {
 
-    const boot =
+    const intro =
         document.getElementById(
-            "bootScreen"
+            "fridayIntro"
         );
 
-    if (boot) {
+    if (intro) {
 
-        boot.style.display =
-            "none";
+        intro.classList.add(
+            "introFinished"
+        );
+
+        setTimeout(() => {
+
+            intro.remove();
+
+        }, 700);
 
     }
 
-}, 3300);
-
-
-/* Enter = send */
-
-const command =
-    document.getElementById(
-        "command"
-    );
-
-if (command) {
-
-    command.addEventListener(
-        "keydown",
-        function(e) {
-
-            if (
-                e.key === "Enter"
-            ) {
-
-                const send =
-                    document.getElementById(
-                        "sendBtn"
-                    );
-
-                if (send)
-                    send.click();
-
-            }
-
-        }
-    );
-
-}
+}, 2800);
 
 </script>
 
