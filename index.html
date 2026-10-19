@@ -138,6 +138,26 @@
 
   </div>
 
+  <div id="selectionPanel" class="selectionPanel">
+    <div class="selectionTop">
+      <div><small>SELECTED NEURAL COMPONENT</small><h3 id="selectedTitle">NO COMPONENT SELECTED</h3></div>
+      <button id="editCodeBtn">EDIT CODE</button>
+    </div>
+    <p id="selectedInfo">Pinch a glowing node or branch to focus it.</p>
+  </div>
+
+</div>
+
+
+<!-- COMPONENT CODE EDITOR -->
+<div id="codeEditor" class="codeEditor">
+  <div class="editorCard">
+    <div class="editorTop"><div><small>FRIDAY NEURAL IDE</small><h2 id="editorTitle">COMPONENT CODE</h2></div><button id="closeEditor">✕</button></div>
+    <p class="editorHint">Edit the component's local code notes/logic. This does not rewrite the website's JavaScript source file.</p>
+    <textarea id="componentCode" spellcheck="false"></textarea>
+    <div class="editorActions"><button id="resetCode">RESET</button><button id="saveCode">SAVE COMPONENT</button></div>
+    <p id="editorStatus"></p>
+  </div>
 </div>
 
 
