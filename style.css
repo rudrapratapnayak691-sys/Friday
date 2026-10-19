@@ -697,31 +697,3 @@ body.online button{
   }
 
 }
-
-
-/* COMPONENT SELECTION + CODE EDITOR */
-.selectionPanel{
-  position:absolute; left:16px; right:16px; top:105px; z-index:26;
-  max-width:520px; padding:12px 14px; border:1px solid rgba(255,101,0,.65);
-  border-radius:12px; background:rgba(2,5,9,.78); backdrop-filter:blur(8px);
-  box-shadow:0 0 18px rgba(255,101,0,.12);
-}
-.selectionTop,.editorTop,.editorActions{display:flex;align-items:center;justify-content:space-between;gap:10px}
-.selectionPanel small,.editorTop small{font-size:8px;letter-spacing:2px;opacity:.65}
-.selectionPanel h3{font-size:13px;margin-top:5px;letter-spacing:1px}
-.selectionPanel p{font-size:11px;line-height:1.5;margin-top:9px;opacity:.8}
-.selectionPanel button{padding:8px 10px;font-size:10px;white-space:nowrap}
-.codeEditor{display:none;position:fixed;inset:0;z-index:90;place-items:center;padding:14px;background:rgba(0,0,0,.82);backdrop-filter:blur(9px)}
-.editorCard{width:min(680px,100%);max-height:92vh;overflow:auto;padding:18px;border:1px solid #ff6500;border-radius:14px;background:#080502;box-shadow:0 0 32px rgba(255,101,0,.25);color:#ff8a35}
-.editorTop h2{font-size:17px;margin-top:5px;letter-spacing:2px}
-.editorHint{font-size:11px;line-height:1.5;opacity:.75;margin:14px 0}
-#componentCode{display:block;width:100%;height:260px;resize:vertical;background:#030303;color:#ffb477;border:1px solid #7d3508;border-radius:8px;padding:12px;font:12px/1.55 monospace;outline:none}
-.editorActions{justify-content:flex-end;margin-top:12px;flex-wrap:wrap}
-.editorActions button{font-size:10px}
-#editorStatus{font-size:10px;min-height:15px;margin-top:10px;opacity:.8}
-@media(max-width:500px){
- .selectionPanel{top:95px;left:10px;right:10px;padding:10px}
- .selectionPanel h3{font-size:11px}
- .selectionPanel p{font-size:10px}
- #componentCode{height:230px}
-}

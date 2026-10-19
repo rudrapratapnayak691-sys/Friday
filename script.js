@@ -12,11 +12,6 @@ let neuralPaused = false;
 let scene, camera, renderer;
 let neuralGroup;
 let nodes = [];
-let branches = [];
-let coreNode = null;
-let selectedComponent = null;
-let lastPinchAt = 0;
-let pinchX = 0.5, pinchY = 0.5;
 let neuralStarted = false;
 
 let lastHandX = null;
@@ -679,8 +674,6 @@ function startNeural() {
         );
 
 
-    core.userData = { componentType:"CORE", componentName:"FRIDAY CORE", code:'// FRIDAY CORE\\nconst core = { role: "central processor", status: "online", connectedNodes: 180 };' };
-    coreNode = core;
     neuralGroup.add(core);
 
 
@@ -744,8 +737,8 @@ function startNeural() {
         );
 
 
-        node.userData = { componentType:"NODE", componentName:"NEURON " + (i + 1), code:'// NEURON ' + (i + 1) + '\\nconst neuron = { type: "neural node", signalStrength: 1.0, active: true };' };
         neuralGroup.add(node);
+
         nodes.push(node);
     }
 
@@ -798,10 +791,14 @@ function startNeural() {
             });
 
 
-        const branch = new THREE.Line(geometry, material);
-        branch.userData = { componentType:"BRANCH", componentName:"SYNAPSE " + (i + 1), code:'// SYNAPSE ' + (i + 1) + '\\nconst synapse = { from: "NEURON ' + (nodes.indexOf(a)+1) + '", to: "NEURON ' + (nodes.indexOf(b)+1) + '", strength: 0.22, enabled: true };' };
-        neuralGroup.add(branch);
-        branches.push(branch);
+        neuralGroup.add(
+
+            new THREE.Line(
+                geometry,
+                material
+            )
+
+        );
     }
 
 
@@ -1109,9 +1106,17 @@ function handleHands(results) {
         hand[8];
 
 
-    const distance = Math.hypot(thumb.x-index.x, thumb.y-index.y);
-    pinchX = (thumb.x + index.x) / 2;
-    pinchY = (thumb.y + index.y) / 2;
+    const distance =
+        Math.hypot(
+
+            thumb.x -
+            index.x,
+
+            thumb.y -
+            index.y
+
+        );
+
 
     if (distance < .065) {
 
@@ -1179,75 +1184,38 @@ function isOpen(hand) {
 ========================================= */
 
 function selectNeural() {
-    if (!renderer || !camera || !neuralGroup) return;
-    const now = Date.now();
-    const doublePinch = now - lastPinchAt < 650;
-    lastPinchAt = now;
-    const target = findNearestComponent(pinchX, pinchY);
-    if (!target) return;
-    selectComponent(target, true);
-    if (doublePinch) openComponentEditor();
+
+    if (!nodes.length)
+        return;
+
+
+    const node =
+        nodes[
+            Math.floor(
+                Math.random() *
+                nodes.length
+            )
+        ];
+
+
+    node.scale.set(
+        4,
+        4,
+        4
+    );
+
+
+    setTimeout(() => {
+
+        node.scale.set(
+            1,
+            1,
+            1
+        );
+
+    }, 500);
 }
 
-function findNearestComponent(nx, ny) {
-    const candidates = [...(coreNode ? [coreNode] : []), ...nodes, ...branches];
-    const pointer = new THREE.Vector2(nx * 2 - 1, -(ny * 2 - 1));
-    let best = null, bestDistance = Infinity;
-    neuralGroup.updateMatrixWorld(true);
-    for (const obj of candidates) {
-        let world = new THREE.Vector3();
-        if (obj.isLine) {
-            const attr = obj.geometry.attributes.position;
-            world.fromBufferAttribute(attr, 0).add(new THREE.Vector3().fromBufferAttribute(attr, 1)).multiplyScalar(.5);
-            world.applyMatrix4(neuralGroup.matrixWorld);
-        } else obj.getWorldPosition(world);
-        world.project(camera);
-        if (world.z < -1 || world.z > 1) continue;
-        const dist = Math.hypot(world.x-pointer.x, world.y-pointer.y);
-        if (dist < (obj.isLine ? .24 : .34) && dist < bestDistance) { best=obj; bestDistance=dist; }
-    }
-    if (!best) {
-        // Reliable fallback: select the nearest visible component to the current view centre.
-        best = candidates.find(o => o.userData.componentType === "CORE") || candidates[0];
-    }
-    return best;
-}
-
-function selectComponent(obj, zoom) {
-    selectedComponent = obj;
-    $("selectedTitle").textContent = obj.userData.componentName || "NEURAL COMPONENT";
-    $("selectedInfo").textContent = obj.userData.componentType + " selected. Pinch again quickly or tap EDIT CODE.";
-    $("gesture").textContent = "SELECTED: " + obj.userData.componentName;
-    if (zoom && camera) {
-        camera.position.z = obj.userData.componentType === "CORE" ? 3.1 : (obj.isLine ? 4.1 : 3.5);
-        if (obj.isLine) {
-            const a = new THREE.Vector3().fromBufferAttribute(obj.geometry.attributes.position,0);
-            const b = new THREE.Vector3().fromBufferAttribute(obj.geometry.attributes.position,1);
-            const mid = a.add(b).multiplyScalar(.5);
-            neuralGroup.position.set(-mid.x*.35,-mid.y*.35,-mid.z*.35);
-        } else {
-            neuralGroup.position.set(-obj.position.x*.25,-obj.position.y*.25,-obj.position.z*.25);
-        }
-    }
-}
-
-function openComponentEditor() {
-    if (!selectedComponent) return;
-    $("editorTitle").textContent = selectedComponent.userData.componentName || "COMPONENT CODE";
-    $("componentCode").value = selectedComponent.userData.code || "// No code notes.";
-    $("editorStatus").textContent = "Edit the component's code notes/logic template.";
-    $("codeEditor").style.display = "grid";
-}
-$("editCodeBtn").onclick = openComponentEditor;
-$("closeEditor").onclick = () => $("codeEditor").style.display = "none";
-$("saveCode").onclick = () => {
-    if (!selectedComponent) return;
-    selectedComponent.userData.code = $("componentCode").value;
-    $("editorStatus").textContent = "SAVED TO COMPONENT (current session).";
-};
-$("resetCode").onclick = () => {
-    if (selectedComponent) $("componentCode").value = selectedComponent.userData.code || "";
-};
 
 /* =========================================
    CLOSE CAMERA
